@@ -1,0 +1,13 @@
+echo "node_modules/
+*/node_modules/
+.env
+*/.env
+dist/
+*/dist/
+dist-ssr
+*.log
+npm-debug.log*
+.vscode/
+.idea
+.DS_Store
+Thumbs.db" > .gitignore
