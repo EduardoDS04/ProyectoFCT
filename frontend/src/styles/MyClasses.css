@@ -1,0 +1,182 @@
+/* Estilos para la pagina de gestion de clases del monitor/admin */
+
+/* Contenedor principal */
+.my-classes-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Encabezado con titulo y boton */
+.my-classes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.my-classes-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+}
+
+/* Contenedor de la tabla */
+.classes-table-container {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+/* Tabla de clases */
+.classes-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.classes-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.classes-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.classes-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background 0.2s;
+}
+
+.classes-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.classes-table tbody tr.past-class {
+  opacity: 0.6;
+}
+
+.classes-table td {
+  padding: 1rem;
+  color: #555;
+}
+
+.class-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.class-name-cell strong {
+  color: #333;
+  font-size: 1.05rem;
+}
+
+.class-name-cell small {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+/* Etiqueta de estado de la clase */
+.status-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-badge.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-badge.completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+/* Indicador de clase llena */
+.classes-table td span.full {
+  color: #c33;
+  font-weight: 600;
+}
+
+/* Celda de acciones */
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Botones de accion */
+.btn-action {
+  padding: 0.5rem 1rem;
+  border: none;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: none;
+}
+
+.btn-action.edit {
+  background: #2196F3;
+}
+
+.btn-action.cancel {
+  background: #f44336;
+}
+
+.btn-action.delete {
+  background: #f44336;
+}
+
+.btn-action.view {
+  background: #4CAF50;
+}
+
+/* Mensaje cuando no hay clases */
+.no-classes {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.no-classes p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+/* Estilos responsive para tablets */
+@media (max-width: 1024px) {
+  .classes-table-container {
+    overflow-x: auto;
+  }
+
+  .classes-table {
+    min-width: 800px;
+  }
+}
+
+/* Estilos responsive para moviles */
+@media (max-width: 768px) {
+  .my-classes-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}
+

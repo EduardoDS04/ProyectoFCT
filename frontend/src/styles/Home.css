@@ -1,0 +1,76 @@
+/* Estilos para la pagina de inicio */
+
+/* Contenedor principal */
+.home-container {
+  min-height: calc(100vh - 80px);
+}
+
+/* Seccion de bienvenida principal */
+.bienvenida-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 5rem 2rem;
+  text-align: center;
+}
+
+/* Titulo principal de bienvenida */
+.bienvenida-title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Subtitulo de bienvenida */
+.bienvenida-subtitle {
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  animation: fadeInUp 0.8s ease-out 0.2s backwards;
+}
+
+/* Contenedor de botones de bienvenida */
+.bienvenida-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 0.4s backwards;
+}
+
+.bienvenida-button {
+  padding: 1rem 2.5rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.bienvenida-button.primary {
+  background: white;
+  color: #667eea;
+}
+
+.bienvenida-button.secondary {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.bienvenida-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Animacion de aparicion desde abajo */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

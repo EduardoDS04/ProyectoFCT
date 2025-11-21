@@ -1,0 +1,278 @@
+/* Estilos para la pagina de listado de clases */
+
+/* Contenedor principal */
+.classes-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Encabezado con titulo y boton */
+.classes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.classes-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+}
+
+/* Botones de filtrado */
+.classes-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Boton de filtro individual */
+.filter-btn {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid #e0e0e0;
+  background: white;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.filter-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+.filter-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+}
+
+/* Grid de tarjetas de clases */
+.classes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+/* Tarjeta individual de clase */
+.class-card {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.class-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.class-card.cancelled {
+  opacity: 0.7;
+  border-left: 4px solid #ff4444;
+}
+
+.class-card.completed {
+  opacity: 0.8;
+  border-left: 4px solid #4CAF50;
+}
+
+/* Encabezado de la tarjeta de clase */
+.class-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.class-card-header h3 {
+  font-size: 1.4rem;
+  color: #333;
+  margin: 0;
+}
+
+.class-status {
+  padding: 0.3rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.class-status.active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.class-status.cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.class-status.completed {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.class-description {
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.class-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.detail-icon {
+  font-size: 1.2rem;
+}
+
+/* Acciones de la tarjeta */
+.class-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Boton de reserva */
+.btn-book {
+  flex: 1;
+  padding: 0.8rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.btn-book:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.btn-book:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  padding: 0.8rem 1.2rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.btn-secondary:hover {
+  transform: scale(1.05);
+}
+
+.booking-disabled {
+  text-align: center;
+  padding: 0.8rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Indicador de reserva realizada */
+.booking-reserved {
+  flex: 1;
+  text-align: center;
+  padding: 0.8rem;
+  background: #d4edda;
+  border-radius: 8px;
+  color: #155724;
+  font-weight: 600;
+  border: 2px solid #c3e6cb;
+}
+
+/* Mensaje cuando no hay clases */
+.no-classes {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.no-classes p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.btn-primary {
+  padding: 0.8rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  padding: 4rem;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #c33;
+}
+
+/* Estilos responsive para tablets y moviles */
+@media (max-width: 768px) {
+  .classes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .classes-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .classes-filters {
+    width: 100%;
+  }
+
+  .filter-btn {
+    flex: 1;
+    min-width: 80px;
+  }
+}
+

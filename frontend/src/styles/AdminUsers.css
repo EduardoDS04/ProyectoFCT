@@ -1,0 +1,286 @@
+/* Estilos para la pagina de gestion de usuarios del administrador */
+
+/* Contenedor principal */
+.admin-users-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Estilos responsive para tablets */
+@media (max-width: 1024px) {
+  .master-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .master-panel {
+    position: static;
+  }
+
+  .master-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .master-item {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+/* Encabezado de la pagina */
+.admin-users-header {
+  margin-bottom: 2rem;
+}
+
+.admin-users-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+/* Grid de estadisticas */
+.users-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Tarjeta de estadistica */
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.stat-card h3 {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card p {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #667eea;
+  margin: 0;
+}
+
+/* Layout Maestro-Detalle */
+.master-detail-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Panel Maestro (Lateral) */
+.master-panel {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+}
+
+.master-panel h2 {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0 0 1rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+/* Lista de usuarios en el panel maestro */
+.master-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Item individual del panel maestro */
+.master-item {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid transparent;
+  background: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: left;
+}
+
+.master-item:hover {
+  background: #e9ecef;
+  border-color: #667eea;
+}
+
+.master-item.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+/* Contenido del item maestro */
+.master-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Etiqueta del item maestro */
+.master-item-label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.master-item.active .master-item-label {
+  color: white;
+}
+
+/* Contador del item maestro */
+.master-item-count {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.master-item.active .master-item-count {
+  color: white;
+}
+
+/* Panel Detalle (Principal) */
+.detail-panel {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+/* Encabezado del panel detalle */
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.detail-header h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
+}
+
+/* Contador de usuarios */
+.detail-count {
+  font-size: 0.9rem;
+  color: #666;
+  background: #f8f9fa;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+/* Contenedor de la tabla de usuarios */
+.users-table-container {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+/* Tabla de usuarios */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table thead {
+  background: #f8f9fa;
+}
+
+.users-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.users-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+  color: #666;
+}
+
+.users-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* Etiqueta del rol del usuario */
+.role-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.role-badge.admin {
+  background: #fee;
+  color: #c33;
+}
+
+.role-badge.monitor {
+  background: #eef;
+  color: #339;
+}
+
+.role-badge.socio {
+  background: #efe;
+  color: #393;
+}
+
+/* Estado activo del usuario */
+.status-active {
+  color: #28a745;
+  font-weight: 600;
+}
+
+/* Estado inactivo del usuario */
+.status-inactive {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* Mensaje cuando no hay usuarios */
+.no-users {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+/* Mensaje de error */
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #c33;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
