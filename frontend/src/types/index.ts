@@ -17,6 +17,27 @@ export enum BookingStatus {
   COMPLETED = 'completed'
 }
 
+// Enums para suscripciones
+export enum SubscriptionType {
+  MONTHLY = 'monthly',      // 1 mes
+  QUARTERLY = 'quarterly',  // 3 meses
+  YEARLY = 'yearly'         // 1 año
+}
+
+export enum SubscriptionStatus {
+  ACTIVE = 'active',
+  EXPIRED = 'expired',
+  CANCELLED = 'cancelled',
+  PENDING = 'pending'
+}
+
+export enum PaymentStatus {
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+  REFUNDED = 'refunded'
+}
+
 // Interfaces de Usuario
 export interface User {
   id: string;
@@ -111,6 +132,38 @@ export interface UpdateClassData {
 // DTOs para requests de reservas
 export interface CreateBookingData {
   classId: string;
+}
+
+// Interfaces de Suscripcion
+export interface Subscription {
+  _id: string;
+  userId: string;
+  subscriptionType: SubscriptionType;
+  startDate: string;
+  endDate: string;
+  status: SubscriptionStatus;
+  paymentStatus: PaymentStatus;
+  amount: number;
+  bankDetails: {
+    cardNumber: string;
+    cardHolder: string;
+    expiryDate: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// DTOs para requests de pagos
+export interface BankDetails {
+  cardNumber: string;
+  cardHolder: string;
+  expiryDate: string;  // MM/YY
+  cvv: string;
+}
+
+export interface CreateSubscriptionData {
+  subscriptionType: SubscriptionType;
+  bankDetails: BankDetails;
 }
 
 // Responses de la API

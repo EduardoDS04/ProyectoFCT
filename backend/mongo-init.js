@@ -15,5 +15,11 @@ db.createCollection('classes');
 db.createCollection('bookings');
 print('Base de datos ' + classDbName + ' creada');
 
+// Crear base de datos para Payment Service
+var paymentDbName = 'gimnasio_payments';
+db = db.getSiblingDB(paymentDbName);
+db.createCollection('subscriptions');
+print('Base de datos ' + paymentDbName + ' creada');
+
 print('Inicialización de MongoDB completada');
 

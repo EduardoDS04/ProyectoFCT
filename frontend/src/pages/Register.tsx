@@ -85,7 +85,6 @@ const Register = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Juan Pérez"
               required
               minLength={2}
               disabled={isLoading}
@@ -113,7 +112,6 @@ const Register = () => {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="612345678"
               pattern="[0-9]{9,15}"
               disabled={isLoading}
             />

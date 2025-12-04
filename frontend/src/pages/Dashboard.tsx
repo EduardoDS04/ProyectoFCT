@@ -6,19 +6,6 @@ import '../styles/Dashboard.css';
 const Dashboard = () => {
   const { user } = useAuth();
 
-  const getRoleBadge = (role: UserRole) => {
-    switch (role) {
-      case UserRole.ADMIN:
-        return 'Administrador';
-      case UserRole.MONITOR:
-        return 'Monitor';
-      case UserRole.SOCIO:
-        return 'Socio';
-      default:
-        return role;
-    }
-  };
-
   // Funcion auxiliar para obtener el mensaje de bienvenida segun el rol
   const getWelcomeMessage = (role: UserRole) => {
     switch (role) {
@@ -36,10 +23,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>Dashboard</h1>
-        <div className="user-badge">
-          {user && getRoleBadge(user.role)}
-        </div>
+        <h1>Menú Principal</h1>
       </div>
 
       <div className="welcome-card">
@@ -48,16 +32,6 @@ const Dashboard = () => {
       </div>
 
       <div className="dashboard-grid">
-        {/* Información del perfil del usuario */}
-        <div className="dashboard-card">
-          <h3>Mi Perfil</h3>
-          <p>Email: {user?.email}</p>
-          {user?.phone && <p>Teléfono: {user.phone}</p>}
-          <p className="card-status">
-            Estado: <span className="status-active">Activo</span>
-          </p>
-        </div>
-
         {/* Opciones para socios */}
         {user?.role === UserRole.SOCIO && (
           <>
@@ -71,6 +45,12 @@ const Dashboard = () => {
               <h3>Clases Disponibles</h3>
               <p>Explora y reserva clases</p>
               <button className="card-button">Ver Clases</button>
+            </div>
+
+            <div className="dashboard-card clickable" onClick={() => window.location.href = '/payment'}>
+              <h3>Suscripción</h3>
+              <p>Gestiona tu suscripción al gimnasio</p>
+              <button className="card-button">Ver Suscripción</button>
             </div>
           </>
         )}

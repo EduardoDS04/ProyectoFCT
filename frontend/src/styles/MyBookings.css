@@ -5,6 +5,8 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
+  background: #1a1a1a;
+  min-height: calc(100vh - 80px);
 }
 
 /* Encabezado de la pagina */
@@ -17,7 +19,7 @@
 
 .my-bookings-header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #ffffff;
 }
 
 /* Botones de filtrado */
@@ -37,16 +39,17 @@
 
 /* Tarjeta individual de reserva */
 .booking-card {
-  background: white;
+  background: #2a2a2a;
   border-radius: 15px;
   padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid #3a3a3a;
 }
 
 .booking-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 20px rgba(23, 118, 156, 0.5);
 }
 
 .booking-card.cancelled {
@@ -68,7 +71,7 @@
 
 .booking-header h3 {
   font-size: 1.4rem;
-  color: #333;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -107,13 +110,13 @@
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  color: #555;
+  color: #cccccc;
   font-size: 0.95rem;
 }
 
 .detail-label {
   font-weight: 600;
-  color: #333;
+  color: #cccccc;
   min-width: 120px;
 }
 
@@ -144,25 +147,27 @@
 .booking-info {
   text-align: center;
   padding: 0.8rem;
-  background: #fff3cd;
+  background: rgba(255, 193, 7, 0.2);
   border-radius: 8px;
-  color: #856404;
+  color: #ffc107;
   font-weight: 500;
   font-size: 0.9rem;
+  border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
 /* Mensaje cuando no hay reservas */
 .no-bookings {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: #2a2a2a;
   border-radius: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid #3a3a3a;
 }
 
 .no-bookings p {
   font-size: 1.2rem;
-  color: #666;
+  color: #cccccc;
   margin-bottom: 2rem;
 }
 

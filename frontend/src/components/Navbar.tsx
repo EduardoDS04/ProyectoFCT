@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import '../styles/Navbar.css';
 
@@ -7,6 +7,7 @@ import '../styles/Navbar.css';
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Funcion para cerrar sesion y redirigir al login
   const handleLogout = () => {
@@ -18,7 +19,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          Gimnasio App
+          GYM10
         </Link>
         
         <div className="navbar-menu">
@@ -27,7 +28,7 @@ const Navbar = () => {
             <>
               {/* Enlace al dashboard, visible para todos los usuarios autenticados */}
               <Link to="/dashboard" className="navbar-link">
-                Dashboard
+                Menú Principal
               </Link>
               {/* Enlace a las clases disponibles, visible para todos */}
               <Link to="/classes" className="navbar-link">
@@ -45,14 +46,16 @@ const Navbar = () => {
                   Mis Reservas
                 </Link>
               )}
+              {/* Enlace a suscripción, solo visible para socios */}
+              {user?.role === 'socio' && (
+                <Link to="/payment" className="navbar-link">
+                  Suscripción
+                </Link>
+              )}
               {/* Enlace al perfil del usuario */}
               <Link to="/profile" className="navbar-link">
                 Perfil
               </Link>
-              {/* Informacion del usuario autenticado */}
-              <span className="navbar-user">
-                {user?.name} ({user?.role})
-              </span>
               {/* Boton para cerrar sesion */}
               <button onClick={handleLogout} className="navbar-button">
                 Cerrar Sesión
@@ -61,10 +64,16 @@ const Navbar = () => {
           ) : (
             <>
               {/* Menu para usuarios no autenticados */}
-              <Link to="/login" className="navbar-link">
+              <Link 
+                to="/login" 
+                className={`navbar-link ${location.pathname === '/login' ? 'active' : ''}`}
+              >
                 Iniciar Sesión
               </Link>
-              <Link to="/register" className="navbar-button">
+              <Link 
+                to="/register" 
+                className={`navbar-link ${location.pathname === '/register' ? 'active' : ''}`}
+              >
                 Registrarse
               </Link>
             </>

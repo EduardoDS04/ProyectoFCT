@@ -5,6 +5,8 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
+  background: #1a1a1a;
+  min-height: calc(100vh - 80px);
 }
 
 /* Encabezado con titulo y boton */
@@ -17,16 +19,17 @@
 
 .my-classes-header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #ffffff;
 }
 
 /* Contenedor de la tabla */
 .classes-table-container {
-  background: white;
+  background: #2a2a2a;
   border-radius: 15px;
   padding: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   overflow-x: auto;
+  border: 1px solid #3a3a3a;
 }
 
 /* Tabla de clases */
@@ -36,7 +39,7 @@
 }
 
 .classes-table thead {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1a1a1a;
   color: white;
 }
 
@@ -44,15 +47,17 @@
   padding: 1rem;
   text-align: left;
   font-weight: 600;
+  color: #ffffff;
+  border-bottom: 2px solid #3a3a3a;
 }
 
 .classes-table tbody tr {
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #3a3a3a;
   transition: background 0.2s;
 }
 
 .classes-table tbody tr:hover {
-  background: #f8f9fa;
+  background: #333333;
 }
 
 .classes-table tbody tr.past-class {
@@ -61,7 +66,7 @@
 
 .classes-table td {
   padding: 1rem;
-  color: #555;
+  color: #cccccc;
 }
 
 .class-name-cell {
@@ -71,12 +76,12 @@
 }
 
 .class-name-cell strong {
-  color: #333;
+  color: #ffffff;
   font-size: 1.05rem;
 }
 
 .class-name-cell small {
-  color: #888;
+  color: #cccccc;
   font-size: 0.85rem;
 }
 
@@ -149,14 +154,15 @@
 .no-classes {
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: #2a2a2a;
   border-radius: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid #3a3a3a;
 }
 
 .no-classes p {
   font-size: 1.2rem;
-  color: #666;
+  color: #cccccc;
   margin-bottom: 2rem;
 }
 

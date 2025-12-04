@@ -1,0 +1,504 @@
+/* Contenedor principal de la pagina de pago */
+.payment-container {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  background: #1a1a1a;
+}
+
+/* Tarjeta principal del formulario de pago */
+.payment-card {
+  background: #2a2a2a;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  padding: 2.5rem;
+  max-width: 800px;
+  width: 100%;
+  border: 1px solid #3a3a3a;
+}
+
+/* Titulo principal */
+.payment-title {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+/* Subtitulo */
+.payment-subtitle {
+  color: #cccccc;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Mensaje de error */
+.payment-error {
+  background: #4a1a1a;
+  color: #ff6b6b;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #6a2a2a;
+}
+
+/* Mensaje de exito */
+.payment-success {
+  text-align: center;
+  padding: 2rem;
+}
+
+.payment-success h2 {
+  color: #4ade80;
+  margin-bottom: 1rem;
+}
+
+.payment-success p {
+  color: #cccccc;
+}
+
+/* Formulario de pago */
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Opciones de suscripcion */
+.subscription-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Opcion de suscripcion individual */
+.subscription-option {
+  border: 2px solid #444444;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #333333;
+}
+
+.subscription-option:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.subscription-option.active {
+  border-color: #667eea;
+  background: #3a3a4a;
+}
+
+.subscription-option h3 {
+  margin: 0 0 0.5rem 0;
+  color: #ffffff;
+  font-size: 1.2rem;
+}
+
+/* Precio de la suscripcion */
+.subscription-price {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #667eea;
+  margin: 0.5rem 0;
+}
+
+/* Ahorro en la suscripcion */
+.subscription-savings {
+  color: #28a745;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.subscription-option p {
+  margin: 0.5rem 0 0 0;
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+/* Seccion de datos bancarios */
+.payment-section {
+  border-top: 1px solid #444444;
+  padding-top: 2rem;
+}
+
+.payment-section h2 {
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+/* Grupos de formulario */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #555555;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  background: #2a2a2a;
+  color: #ffffff;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.form-group input:disabled {
+  background: #1a1a1a;
+  cursor: not-allowed;
+  color: #888888;
+}
+
+/* Fila de formulario para campos lado a lado */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Resumen del pago */
+.payment-summary {
+  background: #333333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  border: 1px solid #444444;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: #cccccc;
+}
+
+.summary-row.total {
+  border-top: 2px solid #667eea;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* Acciones del formulario */
+.payment-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+/* Boton principal de pago */
+.payment-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.payment-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.payment-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Boton secundario */
+.payment-button-secondary {
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid #667eea;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-button-secondary:hover:not(:disabled) {
+  background: #667eea;
+  color: #ffffff;
+}
+
+.payment-button-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Informacion de suscripcion activa */
+.subscription-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.subscription-info-card {
+  background: #333333;
+  border-radius: 8px;
+  padding: 2rem;
+  border: 2px solid #444444;
+}
+
+.subscription-info-card h2 {
+  margin: 0 0 1.5rem 0;
+  color: #ffffff;
+  font-size: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #444444;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #cccccc;
+}
+
+.info-value {
+  color: #ffffff;
+  font-size: 1.1rem;
+}
+
+/* Badge de estado */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.status-active {
+  background: transparent;
+  color: #22c55e;
+  padding: 0;
+  border: none;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-expired {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-pending {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+/* Acciones de suscripcion */
+.subscription-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.payment-button-cancel {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.payment-button-cancel:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.payment-button-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payment-container {
+    padding: 1rem;
+  }
+
+  .payment-card {
+    padding: 1.5rem;
+  }
+
+  .subscription-options {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-actions {
+    flex-direction: column;
+  }
+
+  .payment-button,
+  .payment-button-secondary {
+    width: 100%;
+  }
+
+  .subscription-actions {
+    flex-direction: column;
+  }
+
+  .payment-button-cancel {
+    width: 100%;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Modal de confirmacion */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  width: 90%;
+  max-width: 400px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.modal-message {
+  color: #666;
+  margin-bottom: 2rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-button {
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.modal-button-cancel {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.modal-button-cancel:hover {
+  background: #f0f4ff;
+}
+
+.modal-button-confirm {
+  background: #dc3545;
+  color: white;
+}
+
+.modal-button-confirm:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+@media (max-width: 768px) {
+  .modal-container {
+    width: 95%;
+    max-width: 350px;
+  }
+
+  .modal-content {
+    padding: 1.5rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-button {
+    width: 100%;
+  }
+}
+

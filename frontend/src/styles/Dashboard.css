@@ -5,24 +5,23 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+  background: #1a1a1a;
+  min-height: calc(100vh - 80px);
 }
 
 /* Encabezado del dashboard */
 .dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 2rem;
 }
 
 .dashboard-header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #ffffff;
 }
 
 /* Etiqueta con el rol del usuario */
 .user-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #17769C;
   color: white;
   padding: 0.8rem 1.5rem;
   border-radius: 25px;
@@ -31,12 +30,12 @@
 
 /* Tarjeta de bienvenida */
 .welcome-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #17769C;
   color: white;
   padding: 2rem;
   border-radius: 15px;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(23, 118, 156, 0.3);
 }
 
 .welcome-card h2 {
@@ -59,16 +58,17 @@
 
 /* Tarjeta individual del dashboard */
 .dashboard-card {
-  background: white;
+  background: #2a2a2a;
   padding: 2rem;
   border-radius: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid #3a3a3a;
 }
 
 .dashboard-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 20px rgba(23, 118, 156, 0.5);
 }
 
 .dashboard-card.clickable {
@@ -82,59 +82,65 @@
 
 .dashboard-card h3 {
   font-size: 1.3rem;
-  color: #333;
+  color: #ffffff;
   margin-bottom: 1rem;
 }
 
 .dashboard-card p {
-  color: #666;
+  color: #cccccc;
   margin-bottom: 0.5rem;
 }
 
 .card-number {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: #ffffff;
   margin: 1rem 0;
 }
 
 .card-status {
   margin-top: 1rem;
   font-weight: 600;
+  color: #e0f0f5;
 }
 
 .status-active {
   color: #22c55e;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
 .card-button {
   margin-top: 1rem;
   padding: 0.6rem 1.2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border: none;
+  border: 2px solid white;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .card-button:hover {
+  background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
 }
 
 /* Caja de informacion adicional */
 .info-box {
-  background: white;
+  background: #17769C;
   padding: 2rem;
   border-radius: 15px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid #1e8bb3;
 }
 
 .info-box h3 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: #ffffff;
 }
 
 .info-box ul {
@@ -144,7 +150,8 @@
 
 .info-box li {
   padding: 0.8rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e0f0f5;
 }
 
 .info-box li:last-child {
@@ -152,7 +159,7 @@
 }
 
 .info-box strong {
-  color: #667eea;
+  color: #ffffff;
 }
 
 /* Etiqueta de nuevo elemento */

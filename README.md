@@ -41,6 +41,14 @@ El proyecto está organizado en tres partes principales: dos microservicios back
 - `src/routes/` - Definición de rutas de la API
 - `src/types/` - Definiciones de tipos TypeScript
 
+**`backend/payment-service/`** - Microservicio de pagos y suscripciones (simulado)
+- `src/config/` - Configuración de base de datos
+- `src/controllers/` - Controladores de pagos y suscripciones
+- `src/middleware/` - Middleware de autenticación y autorización
+- `src/models/` - Modelos (Subscription)
+- `src/routes/` - Definición de rutas de la API
+- `src/types/` - Definiciones de tipos TypeScript
+
 **Archivos de configuración backend:**
 - `backend/docker-compose.yml` - Configuración de MongoDB con Docker
 - `backend/mongo-init.js` - Script de inicialización de MongoDB
@@ -66,6 +74,9 @@ El proyecto utiliza una arquitectura de microservicios donde cada servicio tiene
   
 - **Class Service (Puerto 3002)**: Gestiona clases y reservas
   - Base de datos: `gimnasio_classes`
+
+- **Payment Service (Puerto 3003)**: Gestiona pagos y suscripciones
+  - Base de datos: `gimnasio_payments`
 
 La comunicación entre servicios se realiza mediante JWT tokens que contienen la información del usuario.
 
@@ -141,6 +152,22 @@ AUTH_SERVICE_URL=http://localhost:3001
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3001
 ```
 
+#### Payment Service (`backend/payment-service/.env`)
+
+```env
+# Puerto del servicio
+PORT=3003
+
+# MongoDB Connection String
+MONGODB_URI=mongodb://admin:password1234@localhost:27017/gimnasio_payments?authSource=admin
+
+# Auth Service URL (para comunicación entre microservicios)
+AUTH_SERVICE_URL=http://localhost:3001
+
+# CORS Origins (separados por comas)
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3001
+```
+
 #### Frontend (`frontend/.env`)
 
 ```env
@@ -149,6 +176,9 @@ VITE_API_URL=http://localhost:3001
 
 # Class Service URL
 VITE_CLASS_SERVICE_URL=http://localhost:3002
+
+# Payment Service URL
+VITE_PAYMENT_SERVICE_URL=http://localhost:3003
 ```
 
 #### Docker Compose (`backend/.env`)
@@ -177,6 +207,10 @@ npm install
 
 # Class Service
 cd ../class-service
+npm install
+
+# Payment Service
+cd ../payment-service
 npm install
 
 # Frontend
@@ -208,7 +242,11 @@ npm run dev
 cd backend/class-service
 npm run dev
 
-# Terminal 3 - Frontend
+# Terminal 3 - Payment Service
+cd backend/payment-service
+npm run dev
+
+# Terminal 4 - Frontend
 cd frontend
 npm run dev
 ```
@@ -253,6 +291,17 @@ El frontend estará disponible en: http://localhost:5173
 - `PUT /api/bookings/:id/cancel` - Cancelar reserva
 - `GET /api/bookings/class/:classId` - Reservas de una clase (Monitor/Admin)
 
+### Payment Service (http://localhost:3003)
+
+#### Suscripciones (Socio)
+- `GET /api/payments/my-subscriptions` - Obtener mis suscripciones
+- `GET /api/payments/my-subscriptions/:id` - Obtener suscripción por ID
+- `POST /api/payments/subscribe` - Crear nueva suscripción
+- `PUT /api/payments/cancel/:id` - Cancelar suscripción
+
+#### Admin
+- `GET /api/payments/all` - Obtener todas las suscripciones
+
 
 ## Características Principales
 ### Autenticación y Autorización
@@ -277,6 +326,12 @@ El frontend estará disponible en: http://localhost:5173
 - Gestión de usuarios
 - Estadísticas del sistema
 - Control de accesos
+
+### Sistema de Pagos y Suscripciones
+- Suscripciones mensuales, trimestrales y anuales
+- Gestión de datos bancarios (simulado)
+- Historial de suscripciones
+- Cancelación de suscripciones
 
 ## Seguridad
 

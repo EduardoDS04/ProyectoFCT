@@ -5,6 +5,8 @@
   max-width: 1600px;
   margin: 0 auto;
   padding: 2rem;
+  background: #1a1a1a;
+  min-height: calc(100vh - 80px);
 }
 
 /* Estilos responsive para tablets */
@@ -35,7 +37,7 @@
 
 .admin-users-header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #ffffff;
   margin-bottom: 0.5rem;
 }
 
@@ -49,16 +51,17 @@
 
 /* Tarjeta de estadistica */
 .stat-card {
-  background: white;
+  background: #2a2a2a;
   padding: 1.5rem;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   text-align: center;
+  border: 1px solid #3a3a3a;
 }
 
 .stat-card h3 {
   font-size: 0.9rem;
-  color: #666;
+  color: #cccccc;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -67,7 +70,7 @@
 .stat-card p {
   font-size: 2rem;
   font-weight: bold;
-  color: #667eea;
+  color: #17769C;
   margin: 0;
 }
 
@@ -81,21 +84,22 @@
 
 /* Panel Maestro (Lateral) */
 .master-panel {
-  background: white;
+  background: #2a2a2a;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
   height: fit-content;
   position: sticky;
   top: 2rem;
+  border: 1px solid #3a3a3a;
 }
 
 .master-panel h2 {
   font-size: 1.2rem;
-  color: #333;
+  color: #ffffff;
   margin: 0 0 1rem 0;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid #3a3a3a;
 }
 
 /* Lista de usuarios en el panel maestro */
@@ -110,21 +114,22 @@
   width: 100%;
   padding: 1rem;
   border: 2px solid transparent;
-  background: #f8f9fa;
+  background: #1a1a1a;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
   text-align: left;
+  color: #cccccc;
 }
 
 .master-item:hover {
-  background: #e9ecef;
-  border-color: #667eea;
+  background: #333333;
+  border-color: #17769C;
 }
 
 .master-item.active {
-  background: #667eea;
-  border-color: #667eea;
+  background: #17769C;
+  border-color: #17769C;
   color: white;
 }
 
@@ -157,10 +162,11 @@
 
 /* Panel Detalle (Principal) */
 .detail-panel {
-  background: white;
+  background: #2a2a2a;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
+  border: 1px solid #3a3a3a;
 }
 
 /* Encabezado del panel detalle */
@@ -170,12 +176,12 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid #3a3a3a;
 }
 
 .detail-header h2 {
   font-size: 1.5rem;
-  color: #333;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -190,10 +196,11 @@
 
 /* Contenedor de la tabla de usuarios */
 .users-table-container {
-  background: white;
+  background: #2a2a2a;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   overflow-x: auto;
+  border: 1px solid #3a3a3a;
 }
 
 /* Tabla de usuarios */
@@ -203,25 +210,25 @@
 }
 
 .users-table thead {
-  background: #f8f9fa;
+  background: #1a1a1a;
 }
 
 .users-table th {
   padding: 1rem;
   text-align: left;
   font-weight: 600;
-  color: #333;
-  border-bottom: 2px solid #e0e0e0;
+  color: #ffffff;
+  border-bottom: 2px solid #3a3a3a;
 }
 
 .users-table td {
   padding: 1rem;
-  border-bottom: 1px solid #f0f0f0;
-  color: #666;
+  border-bottom: 1px solid #3a3a3a;
+  color: #cccccc;
 }
 
 .users-table tbody tr:hover {
-  background: #f8f9fa;
+  background: #333333;
 }
 
 /* Etiqueta del rol del usuario */
@@ -250,8 +257,11 @@
 
 /* Estado activo del usuario */
 .status-active {
-  color: #28a745;
+  color: #22c55e;
   font-weight: 600;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
 /* Estado inactivo del usuario */

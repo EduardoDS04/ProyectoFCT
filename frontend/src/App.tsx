@@ -14,6 +14,7 @@ import MyClasses from './pages/MyClasses';
 import MyBookings from './pages/MyBookings';
 import ClassBookings from './pages/ClassBookings';
 import AdminUsers from './pages/AdminUsers';
+import Payment from './pages/Payment';
 import { UserRole } from './types';
 import './App.css';
 
@@ -119,6 +120,15 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
               <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de Pagos */}
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
+              <Payment />
             </ProtectedRoute>
           }
         />
