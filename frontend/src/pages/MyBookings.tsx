@@ -109,7 +109,10 @@ const MyBookings = () => {
   return (
     <div className="my-bookings-container">
       <div className="my-bookings-header">
-        <h1>Mis Reservas</h1>
+        <div className="my-bookings-title-container">
+          <h1>Mis Reservas</h1>
+          <img src="/reserva.png" alt="Reservas" className="my-bookings-image" />
+        </div>
         <button onClick={() => navigate('/classes')} className="btn-primary">
           Ver Clases Disponibles
         </button>

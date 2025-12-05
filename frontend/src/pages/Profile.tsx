@@ -90,7 +90,10 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
-      <h1>Mi Perfil</h1>
+      <div className="profile-title-container">
+        <h1>Mi Perfil</h1>
+        <img src="/usuario.png" alt="Usuario" className="profile-image" />
+      </div>
 
       {message && <div className="profile-success">{message}</div>}
       {error && <div className="profile-error">{error}</div>}

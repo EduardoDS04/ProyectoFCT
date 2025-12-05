@@ -17,9 +17,24 @@
   margin-bottom: 2rem;
 }
 
+/* Contenedor del titulo con imagen */
+.classes-title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .classes-header h1 {
   font-size: 2.5rem;
   color: #ffffff;
+  margin: 0;
+}
+
+/* Imagen decorativa junto al titulo */
+.classes-image {
+  width: 55px;
+  height: auto;
+  object-fit: contain;
 }
 
 /* Botones de filtrado */

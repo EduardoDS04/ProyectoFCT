@@ -36,18 +36,21 @@ const Dashboard = () => {
         {user?.role === UserRole.SOCIO && (
           <>
             <div className="dashboard-card clickable" onClick={() => window.location.href = '/bookings'}>
+              <img src="/reserva.png" alt="Reservas" className="dashboard-card-image" />
               <h3>Mis Reservas</h3>
               <p>Ver y gestionar tus reservas</p>
               <button className="card-button">Ver Reservas</button>
             </div>
 
             <div className="dashboard-card clickable" onClick={() => window.location.href = '/classes'}>
+              <img src="/clases.png" alt="Clases" className="dashboard-card-image" />
               <h3>Clases Disponibles</h3>
               <p>Explora y reserva clases</p>
               <button className="card-button">Ver Clases</button>
             </div>
 
             <div className="dashboard-card clickable" onClick={() => window.location.href = '/payment'}>
+              <img src="/money.png" alt="Suscripción" className="dashboard-card-image" />
               <h3>Suscripción</h3>
               <p>Gestiona tu suscripción al gimnasio</p>
               <button className="card-button">Ver Suscripción</button>

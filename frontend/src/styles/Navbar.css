@@ -23,10 +23,20 @@
   color: white;
   text-decoration: none;
   transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .navbar-logo:hover {
   opacity: 0.8;
+}
+
+/* Imagen del logo */
+.navbar-logo-img {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
 }
 
 /* Menu de navegacion */

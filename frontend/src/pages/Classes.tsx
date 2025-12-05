@@ -243,7 +243,10 @@ const Classes = () => {
   return (
     <div className="classes-container">
       <div className="classes-header">
-        <h1>Clases Disponibles</h1>
+        <div className="classes-title-container">
+          <h1>Clases Disponibles</h1>
+          <img src="/clases.png" alt="Clases" className="classes-image" />
+        </div>
         
         {(user?.role === 'monitor' || user?.role === 'admin') && (
           <button 

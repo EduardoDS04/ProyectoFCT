@@ -80,6 +80,14 @@
   margin-bottom: 1rem;
 }
 
+/* Imagen decorativa en las tarjetas del dashboard */
+.dashboard-card-image {
+  width: 55px;
+  height: auto;
+  margin-bottom: 1rem;
+  object-fit: contain;
+}
+
 .dashboard-card h3 {
   font-size: 1.3rem;
   color: #ffffff;

@@ -9,10 +9,25 @@
   min-height: calc(100vh - 80px);
 }
 
+/* Contenedor del titulo con imagen */
+.profile-title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
 .profile-container h1 {
   font-size: 2.5rem;
   color: #ffffff;
-  margin-bottom: 2rem;
+  margin: 0;
+}
+
+/* Imagen decorativa junto al titulo */
+.profile-image {
+  width: 40px;
+  height: auto;
+  object-fit: contain;
 }
 
 /* Mensaje de exito */

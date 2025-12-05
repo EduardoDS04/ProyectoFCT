@@ -34,6 +34,21 @@
   margin-bottom: 2rem;
 }
 
+/* Contenedor de la imagen decorativa */
+.payment-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+/* Imagen decorativa */
+.payment-image {
+  max-width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
 /* Mensaje de error */
 .payment-error {
   background: #4a1a1a;

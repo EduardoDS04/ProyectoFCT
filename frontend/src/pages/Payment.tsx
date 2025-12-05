@@ -6,6 +6,7 @@ import { SubscriptionType, SubscriptionStatus } from '../types';
 import type { Subscription } from '../types';
 import '../styles/Payment.css';
 
+// Componente para gestionar suscripciones y pagos del gimnasio
 const Payment = () => {
   const [subscriptionType, setSubscriptionType] = useState<SubscriptionType>(SubscriptionType.MONTHLY);
   const [bankDetails, setBankDetails] = useState({
@@ -23,6 +24,7 @@ const Payment = () => {
   
   const navigate = useNavigate();
 
+  // Carga las suscripciones del usuario al montar el componente
   useEffect(() => {
     const loadSubscriptions = async () => {
       try {
@@ -43,6 +45,7 @@ const Payment = () => {
     loadSubscriptions();
   }, []);
 
+  // Maneja los cambios en los campos de datos bancarios con validacion y formato
   const handleBankDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
@@ -76,6 +79,7 @@ const Payment = () => {
     setBankDetails({ ...bankDetails, [name]: value });
   };
 
+  // Procesa el formulario de suscripcion con validaciones completas
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
@@ -147,6 +151,7 @@ const Payment = () => {
     }
   };
 
+  // Obtiene el precio segun el tipo de suscripcion seleccionado
   const getPrice = (type: SubscriptionType): number => {
     switch (type) {
       case SubscriptionType.MONTHLY:
@@ -160,6 +165,7 @@ const Payment = () => {
     }
   };
 
+  // Calcula el ahorro al elegir planes trimestrales o anuales
   const getSavings = (type: SubscriptionType): number => {
     const monthlyPrice = 29.99;
     switch (type) {
@@ -172,6 +178,7 @@ const Payment = () => {
     }
   };
 
+  // Formatea las fechas a formato legible 
   const formatDate = (dateString: string): string => {
     try {
       if (!dateString) {
@@ -205,10 +212,12 @@ const Payment = () => {
     }
   };
 
+  // Muestra el modal de confirmacion para cancelar la suscripcion
   const handleCancelClick = () => {
     setShowCancelModal(true);
   };
 
+  // Confirma y ejecuta la cancelacion de la suscripcion activa
   const handleCancelConfirm = async () => {
     if (!activeSubscription) return;
 
@@ -235,6 +244,7 @@ const Payment = () => {
     setShowCancelModal(false);
   };
 
+  // Muestra mensaje de exito cuando el pago se procesa correctamente
   if (success) {
     return (
       <div className="payment-container">
@@ -372,6 +382,10 @@ const Payment = () => {
       <div className="payment-card">
         <h1 className="payment-title">Suscripción al Gimnasio</h1>
         <p className="payment-subtitle">Elige tu plan de suscripción</p>
+        
+        <div className="payment-image-container">
+          <img src="/money.png" alt="Pago" className="payment-image" />
+        </div>
         
         {error && <div className="payment-error">{error}</div>}
         

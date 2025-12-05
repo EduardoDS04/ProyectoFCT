@@ -19,6 +19,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
+          <img src="/adn.png" alt="GYM10 Logo" className="navbar-logo-img" />
           GYM10
         </Link>
         
