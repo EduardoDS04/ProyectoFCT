@@ -71,3 +71,10 @@ export interface AuthResponse {
   };
 }
 
+// Interfaz para respuestas estandarizadas de la API
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
+

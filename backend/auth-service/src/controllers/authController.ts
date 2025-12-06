@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import User from '../models/User';
-import { AuthRequest, RegisterDTO, LoginDTO, AuthResponse, JWTPayload } from '../types';
+import { AuthRequest, RegisterDTO, LoginDTO, AuthResponse, JWTPayload, UserRole } from '../types';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
@@ -40,6 +41,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     await newUser.save();
+
+    // Generar QR para admin y monitor al registrarse
+    if (newUser.role === UserRole.ADMIN || newUser.role === UserRole.MONITOR) {
+      const qrToken = crypto.randomBytes(32).toString('hex');
+      newUser.qrToken = qrToken;
+      newUser.qrGeneratedAt = new Date();
+      await newUser.save();
+    }
 
     // Generar token JWT
     const payload: JWTPayload = {

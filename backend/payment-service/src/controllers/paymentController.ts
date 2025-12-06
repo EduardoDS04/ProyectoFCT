@@ -237,7 +237,10 @@ export const createSubscription = async (
     res.status(201).json({
       success: true,
       message: 'Suscripcion creada exitosamente',
-      data: safeSubscription
+      data: {
+        ...safeSubscription,
+        hasActiveSubscription: true
+      }
     });
   } catch (error) {
     console.error('Error al crear suscripcion:', error);
@@ -303,16 +306,59 @@ export const cancelSubscription = async (
     subscription.status = SubscriptionStatus.CANCELLED;
     await subscription.save();
 
+    // Verificar si el usuario tiene otra suscripcion activa
+    const hasActiveSubscription = await Subscription.exists({
+      userId: req.userId,
+      status: SubscriptionStatus.ACTIVE
+    });
+
     res.status(200).json({
       success: true,
       message: 'Suscripcion cancelada exitosamente',
-      data: subscription
+      data: {
+        ...subscription.toObject(),
+        hasActiveSubscription: !!hasActiveSubscription
+      }
     });
   } catch (error) {
     console.error('Error al cancelar suscripcion:', error);
     res.status(500).json({
       success: false,
       message: 'Error al cancelar suscripcion'
+    });
+  }
+};
+
+// Verificar si el usuario tiene una suscripcion activa
+export const checkActiveSubscription = async (
+  req: AuthRequest,
+  res: Response<ApiResponse>
+): Promise<void> => {
+  try {
+    if (!req.userId) {
+      res.status(401).json({
+        success: false,
+        message: 'Usuario no autenticado'
+      });
+      return;
+    }
+
+    const activeSubscription = await Subscription.findOne({
+      userId: req.userId,
+      status: SubscriptionStatus.ACTIVE
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        hasActiveSubscription: !!activeSubscription
+      }
+    });
+  } catch (error) {
+    console.error('Error al verificar suscripcion activa:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al verificar suscripcion activa'
     });
   }
 };

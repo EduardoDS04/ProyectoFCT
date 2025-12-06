@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import connectDB from './config/database';
 import authRoutes from './routes/auth.routes';
 import adminRoutes from './routes/admin.routes';
+import qrRoutes from './routes/qr.routes';
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use(express.urlencoded({ extended: true }));
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/qr', qrRoutes);
 
 // Ruta de health check
 app.get('/health', (req, res) => {
@@ -71,6 +73,10 @@ app.get('/', (req, res) => {
         updateRole: 'PUT /api/admin/users/:id/role (admin only)',
         toggleActive: 'PUT /api/admin/users/:id/toggle-active (admin only)',
         deleteUser: 'DELETE /api/admin/users/:id (admin only)'
+      },
+      qr: {
+        getMyQR: 'GET /api/qr/me (protected)',
+        validateQR: 'POST /api/qr/validate (protected)'
       }
     }
   });

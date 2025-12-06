@@ -10,6 +10,8 @@ export interface IUserDocument extends Document {
   phone?: string;
   birthDate?: Date;
   isActive: boolean;
+  qrToken?: string; // Token unico para el QR de acceso
+  qrGeneratedAt?: Date; // Fecha de generacion del QR (para validar expiracion de 24h)
 }
 
 // Esquema de Mongoose para el modelo User
@@ -58,6 +60,15 @@ const UserSchema: Schema = new Schema(
     isActive: {
       type: Boolean,
       default: true
+    },
+    // Token unico para el QR de acceso al gimnasio
+    qrToken: {
+      type: String,
+      trim: true
+    },
+    // Fecha de generacion del QR para validar expiracion (24 horas)
+    qrGeneratedAt: {
+      type: Date
     }
   },
   {

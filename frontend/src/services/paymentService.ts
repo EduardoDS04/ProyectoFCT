@@ -124,6 +124,17 @@ class PaymentService {
     return await this.createMockSubscription(data);
   }
 
+  // Verifica si el usuario tiene una suscripcion activa
+  async checkActiveSubscription(): Promise<boolean> {
+    try {
+      const subscriptions = await this.getMySubscriptions();
+      return subscriptions.some(sub => sub.status === SubscriptionStatus.ACTIVE);
+    } catch (error) {
+      console.warn('Error al verificar suscripcion activa:', error);
+      return false;
+    }
+  }
+
   // Cancela una suscripcion existente cambiando su estado a CANCELLED
   async cancelSubscription(id: string): Promise<Subscription> {
     await new Promise(resolve => setTimeout(resolve, 500));

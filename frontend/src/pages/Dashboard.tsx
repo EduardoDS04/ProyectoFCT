@@ -1,10 +1,36 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { UserRole } from '../types';
+import paymentService from '../services/paymentService';
 import '../styles/Dashboard.css';
 
 // Pagina principal del dashboard que muestra diferentes opciones segun el rol del usuario
 const Dashboard = () => {
   const { user } = useAuth();
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
+  const [isCheckingSubscription, setIsCheckingSubscription] = useState(true);
+
+  // Verificar si el socio tiene suscripcion activa
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (user?.role === UserRole.SOCIO) {
+        try {
+          setIsCheckingSubscription(true);
+          const hasActive = await paymentService.checkActiveSubscription();
+          setHasActiveSubscription(hasActive);
+        } catch (error) {
+          console.warn('Error al verificar suscripcion:', error);
+          setHasActiveSubscription(false);
+        } finally {
+          setIsCheckingSubscription(false);
+        }
+      } else {
+        setIsCheckingSubscription(false);
+      }
+    };
+
+    checkSubscription();
+  }, [user?.role]);
 
   // Funcion auxiliar para obtener el mensaje de bienvenida segun el rol
   const getWelcomeMessage = (role: UserRole) => {
@@ -55,6 +81,16 @@ const Dashboard = () => {
               <p>Gestiona tu suscripción al gimnasio</p>
               <button className="card-button">Ver Suscripción</button>
             </div>
+
+            {/* Card de Acceso solo visible si tiene suscripcion activa */}
+            {!isCheckingSubscription && hasActiveSubscription && (
+              <div className="dashboard-card clickable" onClick={() => window.location.href = '/qr'}>
+                <img src="/acceso.png" alt="Acceso" className="dashboard-card-image" />
+                <h3>Acceso</h3>
+                <p>Muestra tu código QR para acceder al gimnasio</p>
+                <button className="card-button">Ver QR</button>
+              </div>
+            )}
           </>
         )}
 
@@ -78,6 +114,14 @@ const Dashboard = () => {
               <p>Ver todas las clases del gimnasio</p>
               <button className="card-button">Ver Clases</button>
             </div>
+
+            {/* Card de Acceso siempre visible para monitores */}
+            <div className="dashboard-card clickable" onClick={() => window.location.href = '/qr'}>
+              <img src="/acceso.png" alt="Acceso" className="dashboard-card-image" />
+              <h3>Acceso</h3>
+              <p>Muestra tu código QR para acceder al gimnasio</p>
+              <button className="card-button">Ver QR</button>
+            </div>
           </>
         )}
 
@@ -100,6 +144,14 @@ const Dashboard = () => {
               <h3>Gestión de Usuarios</h3>
               <p>Ver y administrar todos los usuarios</p>
               <button className="card-button">Ver Usuarios</button>
+            </div>
+
+            {/* Card de Acceso siempre visible para administradores */}
+            <div className="dashboard-card clickable" onClick={() => window.location.href = '/qr'}>
+              <img src="/acceso.png" alt="Acceso" className="dashboard-card-image" />
+              <h3>Acceso</h3>
+              <p>Muestra tu código QR para acceder al gimnasio</p>
+              <button className="card-button">Ver QR</button>
             </div>
           </>
         )}

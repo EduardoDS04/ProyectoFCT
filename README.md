@@ -274,6 +274,10 @@ El frontend estará disponible en: http://localhost:5173
 - `PUT /api/admin/users/:id/toggle-active` - Activar/desactivar usuario
 - `DELETE /api/admin/users/:id` - Eliminar usuario
 
+#### QR de Acceso
+- `GET /api/qr/me` - Obtener mi código QR (regenera automáticamente si expiró)
+- `POST /api/qr/validate` - Validar QR escaneado (para uso futuro)
+
 ### Class Service (http://localhost:3002)
 
 #### Clases
@@ -296,6 +300,7 @@ El frontend estará disponible en: http://localhost:5173
 #### Suscripciones (Socio)
 - `GET /api/payments/my-subscriptions` - Obtener mis suscripciones
 - `GET /api/payments/my-subscriptions/:id` - Obtener suscripción por ID
+- `GET /api/payments/me/active` - Verificar si tengo suscripción activa
 - `POST /api/payments/subscribe` - Crear nueva suscripción
 - `PUT /api/payments/cancel/:id` - Cancelar suscripción
 
@@ -332,6 +337,14 @@ El frontend estará disponible en: http://localhost:5173
 - Gestión de datos bancarios (simulado)
 - Historial de suscripciones
 - Cancelación de suscripciones
+
+### Sistema de Códigos QR de Acceso
+- Generación automática de QR único por usuario
+- QR con expiración de 24 horas (se renueva automáticamente)
+- Acceso inmediato para Admin y Monitor desde el registro
+- Acceso condicional para Socios (solo con suscripción activa)
+- El QR desaparece automáticamente si el socio cancela su suscripción
+- Validación de QR para uso futuro con lectores de acceso
 
 ## Seguridad
 

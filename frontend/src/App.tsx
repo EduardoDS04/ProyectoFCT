@@ -15,6 +15,7 @@ import MyBookings from './pages/MyBookings';
 import ClassBookings from './pages/ClassBookings';
 import AdminUsers from './pages/AdminUsers';
 import Payment from './pages/Payment';
+import QR from './pages/QR';
 import { UserRole } from './types';
 import './App.css';
 
@@ -129,6 +130,15 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
               <Payment />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de QR */}
+        <Route
+          path="/qr"
+          element={
+            <ProtectedRoute>
+              <QR />
             </ProtectedRoute>
           }
         />

@@ -136,13 +136,9 @@ const Payment = () => {
       
       setActiveSubscription(newSubscription);
       setSuccess(true);
-      setTimeout(async () => {
-        setSuccess(false);
-        const subscriptions = await paymentService.getMySubscriptions();
-        const active = subscriptions.find(
-          sub => sub.status === SubscriptionStatus.ACTIVE
-        );
-        setActiveSubscription(active || null);
+      // Redirigir al Dashboard después de 2 segundos para que aparezca el card "Acceso"
+      setTimeout(() => {
+        navigate('/dashboard');
       }, 2000);
     } catch (err) {
       setError(getErrorMessage(err, 'Error al procesar el pago'));
@@ -228,11 +224,8 @@ const Payment = () => {
     try {
       await paymentService.cancelSubscription(activeSubscription._id);
       setActiveSubscription(null);
-      const subscriptions = await paymentService.getMySubscriptions();
-      const active = subscriptions.find(
-        sub => sub.status === SubscriptionStatus.ACTIVE
-      );
-      setActiveSubscription(active || null);
+      // Redirigir al Dashboard para que desaparezca el card "Acceso"
+      navigate('/dashboard');
     } catch (err) {
       setError(getErrorMessage(err, 'Error al cancelar la suscripción'));
     } finally {
