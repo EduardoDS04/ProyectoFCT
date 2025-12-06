@@ -16,6 +16,8 @@ import ClassBookings from './pages/ClassBookings';
 import AdminUsers from './pages/AdminUsers';
 import Payment from './pages/Payment';
 import QR from './pages/QR';
+import Feedback from './pages/Feedback';
+import AdminFeedback from './pages/AdminFeedback';
 import { UserRole } from './types';
 import './App.css';
 
@@ -121,6 +123,23 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
               <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de Feedback */}
+        <Route
+          path="/admin/feedback"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+              <AdminFeedback />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/feedback"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
+              <Feedback />
             </ProtectedRoute>
           }
         />

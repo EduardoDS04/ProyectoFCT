@@ -102,7 +102,33 @@
   border-bottom: 2px solid #3a3a3a;
 }
 
-/* Lista de usuarios en el panel maestro */
+/* Título del  maestro detalle con flecha desplegable */
+.master-panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+.master-panel-title:hover {
+  color: #17769C;
+}
+
+/* Flecha desplegable */
+.dropdown-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+  color: #cccccc;
+  display: inline-block;
+}
+
+.dropdown-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+/* Lista de usuarios */
 .master-list {
   display: flex;
   flex-direction: column;
@@ -171,9 +197,6 @@
 
 /* Encabezado del panel detalle */
 .detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #3a3a3a;
@@ -183,15 +206,6 @@
   font-size: 1.5rem;
   color: #ffffff;
   margin: 0;
-}
-
-/* Contador de usuarios */
-.detail-count {
-  font-size: 0.9rem;
-  color: #666;
-  background: #f8f9fa;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
 }
 
 /* Contenedor de la tabla de usuarios */

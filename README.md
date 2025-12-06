@@ -49,6 +49,14 @@ El proyecto está organizado en tres partes principales: dos microservicios back
 - `src/routes/` - Definición de rutas de la API
 - `src/types/` - Definiciones de tipos TypeScript
 
+**`backend/feedback-service/`** - Microservicio de feedback, quejas y valoraciones
+- `src/config/` - Configuración de base de datos
+- `src/controllers/` - Controladores de feedback
+- `src/middleware/` - Middleware de autenticación y autorización
+- `src/models/` - Modelos (Feedback)
+- `src/routes/` - Definición de rutas de la API
+- `src/types/` - Definiciones de tipos TypeScript
+
 **Archivos de configuración backend:**
 - `backend/docker-compose.yml` - Configuración de MongoDB con Docker
 - `backend/mongo-init.js` - Script de inicialización de MongoDB
@@ -77,6 +85,9 @@ El proyecto utiliza una arquitectura de microservicios donde cada servicio tiene
 
 - **Payment Service (Puerto 3003)**: Gestiona pagos y suscripciones
   - Base de datos: `gimnasio_payments`
+
+- **Feedback Service (Puerto 3004)**: Gestiona feedback, quejas y valoraciones de los socios
+  - Base de datos: `gimnasio_feedback`
 
 La comunicación entre servicios se realiza mediante JWT tokens que contienen la información del usuario.
 
@@ -168,6 +179,22 @@ AUTH_SERVICE_URL=http://localhost:3001
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3001
 ```
 
+#### Feedback Service (`backend/feedback-service/.env`)
+
+```env
+# Puerto del servicio
+PORT=3004
+
+# MongoDB Connection String
+MONGODB_URI=mongodb://admin:password1234@localhost:27017/gimnasio_feedback?authSource=admin
+
+# Auth Service URL (para comunicación entre microservicios)
+AUTH_SERVICE_URL=http://localhost:3001
+
+# CORS Origins (separados por comas)
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3001
+```
+
 #### Frontend (`frontend/.env`)
 
 ```env
@@ -179,6 +206,9 @@ VITE_CLASS_SERVICE_URL=http://localhost:3002
 
 # Payment Service URL
 VITE_PAYMENT_SERVICE_URL=http://localhost:3003
+
+# Feedback Service URL
+VITE_FEEDBACK_SERVICE_URL=http://localhost:3004
 ```
 
 #### Docker Compose (`backend/.env`)
@@ -211,6 +241,10 @@ npm install
 
 # Payment Service
 cd ../payment-service
+npm install
+
+# Feedback Service
+cd ../feedback-service
 npm install
 
 # Frontend
@@ -246,7 +280,11 @@ npm run dev
 cd backend/payment-service
 npm run dev
 
-# Terminal 4 - Frontend
+# Terminal 4 - Feedback Service
+cd backend/feedback-service
+npm run dev
+
+# Terminal 5 - Frontend
 cd frontend
 npm run dev
 ```
@@ -308,6 +346,15 @@ El frontend estará disponible en: http://localhost:5173
 - `GET /api/payments/all` - Obtener todas las suscripciones
 
 
+### Feedback Service (http://localhost:3004)
+
+#### Feedback (Socio)
+- `POST /api/feedback` - Crear nuevo feedback (queja, valoración o duda)
+
+#### Admin
+- `GET /api/feedback` - Obtener todos los feedbacks
+- `GET /api/feedback/:id` - Obtener feedback por ID
+
 ## Características Principales
 ### Autenticación y Autorización
 - Registro de usuarios con validación
@@ -337,6 +384,12 @@ El frontend estará disponible en: http://localhost:5173
 - Gestión de datos bancarios (simulado)
 - Historial de suscripciones
 - Cancelación de suscripciones
+
+### Sistema de Feedback
+- Los socios pueden enviar feedback (quejas, valoraciones o dudas)
+- El admin puede ver todos los feedbacks recibidos con información del usuario
+- Almacenamiento persistente de todos los mensajes en base de datos
+- Filtrado por tipo de feedback (queja, valoración, duda)
 
 ### Sistema de Códigos QR de Acceso
 - Generación automática de QR único por usuario

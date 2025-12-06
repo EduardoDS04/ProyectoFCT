@@ -1,0 +1,382 @@
+/* Contenedor principal de la pagina de administracion de feedback */
+.admin-feedback-container {
+  min-height: calc(100vh - 80px);
+  padding: 2rem;
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+/* Encabezado de la pagina */
+.admin-feedback-header {
+  margin-bottom: 2rem;
+}
+
+.admin-feedback-header h1 {
+  font-size: 2rem;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Boton de volver */
+.btn-back {
+  background: #2E7F85;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-back:hover {
+  background: #256a6f;
+}
+
+/* Layout Maestro-Detalle */
+.master-detail-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Panel Maestro (Lateral) */
+.master-panel {
+  background: #2a2a2a;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+  border: 1px solid #3a3a3a;
+}
+
+.master-panel h2 {
+  font-size: 1.2rem;
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #3a3a3a;
+}
+
+/* Título del panel maestro con flecha desplegable */
+.master-panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+.master-panel-title:hover {
+  color: #17769C;
+}
+
+/* Flecha desplegable */
+.dropdown-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+  color: #cccccc;
+  display: inline-block;
+}
+
+.dropdown-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+/* Lista de tipos en el panel maestro */
+.master-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Item individual del panel maestro */
+.master-item {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid transparent;
+  background: #1a1a1a;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: left;
+  color: #cccccc;
+}
+
+.master-item:hover {
+  background: #3a3a3a;
+  border-color: #17769C;
+}
+
+.master-item.active {
+  background: #17769C;
+  border-color: #17769C;
+  color: white;
+}
+
+/* Contenido del item maestro */
+.master-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Etiqueta del item maestro */
+.master-item-label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.master-item.active .master-item-label {
+  color: white;
+}
+
+/* Contador del item maestro */
+.master-item-count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.master-item.active .master-item-count {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* Panel Detalle (Principal) */
+.detail-panel {
+  background: #2a2a2a;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  border: 1px solid #3a3a3a;
+}
+
+/* Encabezado del panel detalle */
+.detail-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #3a3a3a;
+}
+
+.detail-header h2 {
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Mensaje de error */
+.error-message {
+  background: #4a1a1a;
+  color: #ff6b6b;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #ff6b6b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Boton de reintentar */
+.btn-retry {
+  background: #dc3545;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-retry:hover {
+  background: #c82333;
+}
+
+/* Mensaje cuando no hay feedbacks */
+.no-feedbacks {
+  text-align: center;
+  padding: 3rem;
+  color: #999999;
+  font-size: 1.1rem;
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #3a3a3a;
+}
+
+/* Lista de feedbacks */
+.feedbacks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Tarjeta de feedback individual */
+.feedback-card {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: border-color 0.3s ease;
+}
+
+.feedback-card:hover {
+  border-color: #17769C;
+}
+
+/* Encabezado de la tarjeta de feedback */
+.feedback-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Informacion del usuario */
+.feedback-user-info {
+  flex: 1;
+}
+
+.feedback-user-info h3 {
+  font-size: 1.2rem;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+}
+
+.feedback-user-id {
+  font-size: 0.85rem;
+  color: #999999;
+}
+
+/* Badge de tipo de feedback */
+.feedback-type-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.feedback-type-queja {
+  background: #4a1a1a;
+  color: #ff6b6b;
+}
+
+.feedback-type-valoracion {
+  background: #1a4a1a;
+  color: #4ade80;
+}
+
+.feedback-type-duda {
+  background: #1a3a4a;
+  color: #60a5fa;
+}
+
+/* Mensaje del feedback */
+.feedback-message {
+  margin-bottom: 1rem;
+}
+
+.feedback-message p {
+  color: #cccccc;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Pie de la tarjeta de feedback */
+.feedback-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #3a3a3a;
+}
+
+.feedback-date {
+  font-size: 0.85rem;
+  color: #999999;
+}
+
+/* Mensaje de carga */
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #cccccc;
+  font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .master-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .master-panel {
+    position: static;
+  }
+
+  .master-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .master-item {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-feedback-container {
+    padding: 1rem;
+  }
+
+  .admin-feedback-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-feedback-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .master-detail-layout {
+    gap: 1rem;
+  }
+
+  .master-panel {
+    padding: 1rem;
+  }
+
+  .detail-panel {
+    padding: 1rem;
+  }
+
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .feedback-card-header {
+    flex-direction: column;
+  }
+
+  .feedback-type-badge {
+    align-self: flex-start;
+  }
+}
+

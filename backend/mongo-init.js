@@ -21,5 +21,11 @@ db = db.getSiblingDB(paymentDbName);
 db.createCollection('subscriptions');
 print('Base de datos ' + paymentDbName + ' creada');
 
+// Crear base de datos para Feedback Service
+var feedbackDbName = 'gimnasio_feedback';
+db = db.getSiblingDB(feedbackDbName);
+db.createCollection('feedbacks');
+print('Base de datos ' + feedbackDbName + ' creada');
+
 print('Inicialización de MongoDB completada');
 

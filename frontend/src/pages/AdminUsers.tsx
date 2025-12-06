@@ -11,6 +11,7 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<UserRole | 'all'>('all');
+  const [isExpanded, setIsExpanded] = useState(false); // Estado para controlar el desplegable (oculto por defecto)
 
   useEffect(() => {
     loadUsers();
@@ -71,41 +72,27 @@ const AdminUsers = () => {
         <h1>Gestión de Usuarios</h1>
       </div>
 
-      <div className="users-stats">
-        <div className="stat-card">
-          <h3>Total</h3>
-          <p>{stats.total}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Administradores</h3>
-          <p>{stats.admins}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Monitores</h3>
-          <p>{stats.monitors}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Socios</h3>
-          <p>{stats.socios}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Activos</h3>
-          <p>{stats.active}</p>
-        </div>
-      </div>
-
       <div className="master-detail-layout">
         {/* Panel Maestro (Lateral) */}
         <div className="master-panel">
-          <h2>Filtrar por Rol</h2>
-          <div className="master-list">
+          <h2 
+            className="master-panel-title"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            Filtrar por Rol
+            <span className={`dropdown-arrow ${isExpanded ? 'expanded' : ''}`}>
+              ▼
+            </span>
+          </h2>
+          {isExpanded && (
+            <div className="master-list">
             <button 
               className={`master-item ${filter === 'all' ? 'active' : ''}`}
               onClick={() => setFilter('all')}
             >
               <div className="master-item-content">
                 <span className="master-item-label">Todos</span>
-                <span className="master-item-count">({stats.total})</span>
+                <span className="master-item-count">{stats.total}</span>
               </div>
             </button>
             <button 
@@ -114,7 +101,7 @@ const AdminUsers = () => {
             >
               <div className="master-item-content">
                 <span className="master-item-label">Administradores</span>
-                <span className="master-item-count">({stats.admins})</span>
+                <span className="master-item-count">{stats.admins}</span>
               </div>
             </button>
             <button 
@@ -123,7 +110,7 @@ const AdminUsers = () => {
             >
               <div className="master-item-content">
                 <span className="master-item-label">Monitores</span>
-                <span className="master-item-count">({stats.monitors})</span>
+                <span className="master-item-count">{stats.monitors}</span>
               </div>
             </button>
             <button 
@@ -132,10 +119,11 @@ const AdminUsers = () => {
             >
               <div className="master-item-content">
                 <span className="master-item-label">Socios</span>
-                <span className="master-item-count">({stats.socios})</span>
+                <span className="master-item-count">{stats.socios}</span>
               </div>
             </button>
           </div>
+          )}
         </div>
 
         {/* Panel Detalle (Principal) */}
@@ -147,7 +135,6 @@ const AdminUsers = () => {
               {filter === UserRole.MONITOR && 'Monitores'}
               {filter === UserRole.SOCIO && 'Socios'}
             </h2>
-            <span className="detail-count">{filteredUsers.length} usuario{filteredUsers.length !== 1 ? 's' : ''}</span>
           </div>
 
           {error && <div className="error-message">{error}</div>}

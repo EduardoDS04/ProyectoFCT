@@ -38,6 +38,13 @@ export enum PaymentStatus {
   REFUNDED = 'refunded'
 }
 
+// Enum para tipos de feedback
+export enum FeedbackType {
+  QUEJA = 'queja',
+  VALORACION = 'valoracion',
+  DUDA = 'duda'
+}
+
 // Interfaces de Usuario
 export interface User {
   id: string;
@@ -164,6 +171,23 @@ export interface BankDetails {
 export interface CreateSubscriptionData {
   subscriptionType: SubscriptionType;
   bankDetails: BankDetails;
+}
+
+// Interfaces de Feedback
+export interface Feedback {
+  _id: string;
+  userId: string;
+  userName: string;
+  message: string;
+  type: FeedbackType;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// DTO para crear un feedback
+export interface CreateFeedbackData {
+  message: string;
+  type: FeedbackType;
 }
 
 // Responses de la API

@@ -1,0 +1,202 @@
+/* Contenedor principal de la pagina de feedback */
+.feedback-container {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  background: #1a1a1a;
+}
+
+/* Tarjeta principal del formulario de feedback */
+.feedback-card {
+  background: #2a2a2a;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  padding: 2.5rem;
+  max-width: 700px;
+  width: 100%;
+  border: 1px solid #3a3a3a;
+}
+
+/* Titulo principal */
+.feedback-card h1 {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+/* Subtitulo */
+.feedback-subtitle {
+  color: #cccccc;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+/* Mensaje de exito */
+.feedback-success {
+  background: #1a4a1a;
+  color: #4ade80;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #4ade80;
+  text-align: center;
+}
+
+/* Mensaje de error */
+.feedback-error {
+  background: #4a1a1a;
+  color: #ff6b6b;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #ff6b6b;
+}
+
+/* Formulario de feedback */
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Grupo de campos del formulario */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Etiquetas de los campos */
+.form-group label {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Select para tipo de feedback */
+.form-select {
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #17769C;
+}
+
+/* Textarea para el mensaje */
+.form-textarea {
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #3a3a3a;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.3s ease;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #17769C;
+}
+
+.form-textarea::placeholder {
+  color: #666666;
+}
+
+/* Helper text para contador de caracteres */
+.form-helper {
+  color: #999999;
+  font-size: 0.875rem;
+  text-align: right;
+}
+
+/* Acciones del formulario */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+/* Botones */
+.btn-primary {
+  background: #17769C;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #135d7a;
+}
+
+.btn-primary:disabled {
+  background: #3a3a3a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-secondary {
+  background: #dc3545;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.btn-secondary:disabled {
+  background: #3a3a3a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .feedback-container {
+    padding: 1rem;
+  }
+
+  .feedback-card {
+    padding: 1.5rem;
+  }
+
+  .feedback-card h1 {
+    font-size: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+}
+
