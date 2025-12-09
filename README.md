@@ -1,6 +1,6 @@
 # ProyectoFCT - Sistema de Gestión de Gimnasio
 
-Aplicación web desarrollada con arquitectura de microservicios para la gestión de un gimnasio. Incluye sistema de autenticación, gestión de clases y reservas.
+Aplicación web desarrollada con arquitectura de microservicios para la gestión de un gimnasio. Incluye sistema de autenticación, gestión de clases y reservas, pagos y suscripciones, feedback y notificaciones, códigos QR de acceso, y rutinas y ejercicios personalizados.
 
 ## Tecnologías Utilizadas
 
@@ -20,7 +20,7 @@ Aplicación web desarrollada con arquitectura de microservicios para la gestión
 
 ## Estructura del Proyecto
 
-El proyecto está organizado en tres partes principales: dos microservicios backend y una aplicación frontend.
+El proyecto está organizado en seis partes principales: cinco microservicios backend y una aplicación frontend.
 
 ### Backend
 
@@ -57,6 +57,14 @@ El proyecto está organizado en tres partes principales: dos microservicios back
 - `src/routes/` - Definición de rutas de la API
 - `src/types/` - Definiciones de tipos TypeScript
 
+**`backend/routine-service/`** - Microservicio de rutinas y ejercicios
+- `src/config/` - Configuración de base de datos
+- `src/controllers/` - Controladores de ejercicios, rutinas y rutinas de usuario
+- `src/middleware/` - Middleware de autenticación y autorización
+- `src/models/` - Modelos (Exercise, Routine, UserRoutine)
+- `src/routes/` - Definición de rutas de la API
+- `src/types/` - Definiciones de tipos TypeScript
+
 **Archivos de configuración backend:**
 - `backend/docker-compose.yml` - Configuración de MongoDB con Docker
 - `backend/mongo-init.js` - Script de inicialización de MongoDB
@@ -89,11 +97,14 @@ El proyecto utiliza una arquitectura de microservicios donde cada servicio tiene
 - **Feedback Service (Puerto 3004)**: Gestiona feedback, quejas y valoraciones de los socios
   - Base de datos: `gimnasio_feedback`
 
+- **Routine Service (Puerto 3005)**: Gestiona rutinas de ejercicios y ejercicios personalizados
+  - Base de datos: `gimnasio_routines`
+
 La comunicación entre servicios se realiza mediante JWT tokens que contienen la información del usuario.
 
 ## Roles de Usuario
 
-- **Socio**: Puede ver clases y realizar reservas
+- **Socio**: Puede ver clases y realizar reservas, gestionar suscripciones, enviar feedback, acceder con QR, y crear rutinas personalizadas
 - **Monitor**: Puede crear y gestionar sus clases
 - **Admin**: Acceso completo al sistema
 
@@ -195,6 +206,22 @@ AUTH_SERVICE_URL=http://localhost:3001
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3001
 ```
 
+#### Routine Service (`backend/routine-service/.env`)
+
+```env
+# Puerto del servicio
+PORT=3005
+
+# MongoDB Connection String
+MONGODB_URI=mongodb://admin:password1234@localhost:27017/gimnasio_routines?authSource=admin
+
+# Auth Service URL (para comunicación entre microservicios)
+AUTH_SERVICE_URL=http://localhost:3001
+
+# CORS Origins (separados por comas)
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3001
+```
+
 #### Frontend (`frontend/.env`)
 
 ```env
@@ -209,6 +236,9 @@ VITE_PAYMENT_SERVICE_URL=http://localhost:3003
 
 # Feedback Service URL
 VITE_FEEDBACK_SERVICE_URL=http://localhost:3004
+
+# Routine Service URL
+VITE_ROUTINE_SERVICE_URL=http://localhost:3005
 ```
 
 #### Docker Compose (`backend/.env`)
@@ -219,8 +249,15 @@ MONGO_PORT=27017
 MONGO_ROOT_USERNAME=admin
 MONGO_ROOT_PASSWORD=password1234
 MONGO_INITDB_DATABASE=gimnasio_auth
+
+# Referencia de bases de datos (se crean automáticamente en mongo-init.js)
 MONGO_CLASS_DATABASE=gimnasio_classes
+MONGO_PAYMENT_DATABASE=gimnasio_payments
+MONGO_FEEDBACK_DATABASE=gimnasio_feedback
+MONGO_ROUTINE_DATABASE=gimnasio_routines
 ```
+
+**Nota**: Solo `MONGO_INITDB_DATABASE` se usa en docker-compose.yml. Las demás variables son solo para referencia/documentación. Todas las bases de datos se crean automáticamente mediante `mongo-init.js`.
 
 **CONFIGURACIÓN OBLIGATORIA**: 
 - Todas las variables son obligatorias - sin valores por defecto
@@ -247,6 +284,10 @@ npm install
 cd ../feedback-service
 npm install
 
+# Routine Service
+cd ../routine-service
+npm install
+
 # Frontend
 cd ../../frontend
 npm install
@@ -262,6 +303,17 @@ npm run init-admin
 ```
 
 Este comando creará el usuario administrador inicial con las credenciales definidas en las variables de entorno.
+
+**Restaurar contraseña del administrador:**
+
+Si necesitas restaurar la contraseña del administrador (usando las credenciales definidas en `.env`):
+
+```bash
+cd backend/auth-service
+npm run reset-admin-password
+```
+
+Este comando restablecerá la contraseña del administrador con el email y contraseña definidos en las variables de entorno `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
 
 ### 6. Iniciar los servicios
 
@@ -284,7 +336,11 @@ npm run dev
 cd backend/feedback-service
 npm run dev
 
-# Terminal 5 - Frontend
+# Terminal 5 - Routine Service
+cd backend/routine-service
+npm run dev
+
+# Terminal 6 - Frontend
 cd frontend
 npm run dev
 ```
@@ -332,6 +388,7 @@ El frontend estará disponible en: http://localhost:5173
 - `GET /api/bookings/my-bookings` - Mis reservas
 - `PUT /api/bookings/:id/cancel` - Cancelar reserva
 - `GET /api/bookings/class/:classId` - Reservas de una clase (Monitor/Admin)
+- `GET /api/bookings` - Obtener todas las reservas (Admin)
 
 ### Payment Service (http://localhost:3003)
 
@@ -353,7 +410,7 @@ El frontend estará disponible en: http://localhost:5173
 - `GET /api/feedback/my-feedbacks` - Obtener mis feedbacks con conversaciones
 - `POST /api/feedback/:id/respond` - Responder a un feedback (continuar conversación)
 - `POST /api/feedback/:id/mark-read` - Marcar feedback como leído
-- `GET /api/feedback/unread/count` - Obtener contador de mensajes no leídos
+- `GET /api/feedback/notifications/count` - Obtener contador de mensajes no leídos
 
 #### Admin
 - `GET /api/feedback` - Obtener todos los feedbacks (con filtro de archivados)
@@ -361,9 +418,34 @@ El frontend estará disponible en: http://localhost:5173
 - `POST /api/feedback/:id/respond` - Responder a un feedback
 - `POST /api/feedback/:id/archive` - Archivar/desarchivar feedback
 - `GET /api/feedback/unanswered/count` - Contador de feedbacks sin responder
-- `POST /api/feedback/mark-read` - Marcar todos los feedbacks como leídos
+- `POST /api/feedback/mark-all-read-admin` - Marcar todos los feedbacks como leídos
 - `GET /api/feedback/archived/unread/count` - Contador de mensajes no leídos en archivados
 - `POST /api/feedback/mark-archived-read` - Marcar archivados como leídos
+
+### Routine Service (http://localhost:3005)
+
+#### Ejercicios (Públicos para ver, Admin para gestionar)
+- `GET /api/exercises` - Listar todos los ejercicios (con filtros: muscleGroup, difficulty, search)
+- `GET /api/exercises/:id` - Obtener ejercicio por ID
+- `POST /api/exercises` - Crear ejercicio (Admin)
+- `PUT /api/exercises/:id` - Actualizar ejercicio (Admin)
+- `DELETE /api/exercises/:id` - Eliminar ejercicio (Admin)
+
+#### Rutinas Predefinidas (Públicas para ver, Admin para gestionar)
+- `GET /api/routines` - Listar todas las rutinas predefinidas
+- `GET /api/routines/:id` - Obtener rutina por ID con ejercicios
+- `POST /api/routines` - Crear rutina predefinida (Admin)
+- `PUT /api/routines/:id` - Actualizar rutina predefinida (Admin)
+- `DELETE /api/routines/:id` - Eliminar rutina predefinida (Admin)
+
+#### Rutinas Personalizadas (Socio)
+- `GET /api/user-routines/me` - Obtener mi rutina personalizada
+- `POST /api/user-routines/me` - Crear o actualizar mi rutina personalizada
+- `POST /api/user-routines/me/exercises` - Añadir ejercicio a mi rutina
+- `PUT /api/user-routines/me/exercises/:exerciseIndex` - Actualizar ejercicio en mi rutina
+- `POST /api/user-routines/me/exercises/reorder` - Reordenar ejercicios en mi rutina
+- `DELETE /api/user-routines/me/exercises/:exerciseIndex` - Eliminar ejercicio de mi rutina
+- `DELETE /api/user-routines/me` - Eliminar mi rutina personalizada completa
 
 ## Características Principales
 ### Autenticación y Autorización
@@ -426,6 +508,15 @@ El frontend estará disponible en: http://localhost:5173
 - El QR desaparece automáticamente si el socio cancela su suscripción
 - Validación de QR para uso futuro con lectores de acceso
 
+### Sistema de Rutinas y Ejercicios
+- **Ejercicios Base**: Catálogo de ejercicios con videos de YouTube, descripción, grupo muscular y nivel de dificultad
+- **Rutinas Predefinidas**: Rutinas creadas por administradores con ejercicios seleccionados
+- **Rutinas Personalizadas**: Los socios pueden crear su propia rutina personalizada
+- **Personalización de Ejercicios**: Los socios pueden añadir ejercicios a su rutina personalizando series, repeticiones y peso
+- **Integración con YouTube**: Videos embebidos de YouTube para demostración de ejercicios
+- **Filtros y Búsqueda**: Filtrado por grupo muscular, dificultad y búsqueda por texto
+- **Gestión Completa**: CRUD completo de ejercicios y rutinas para administradores
+
 ## Seguridad
 
 - Contraseñas hasheadas con bcryptjs
@@ -437,9 +528,13 @@ El frontend estará disponible en: http://localhost:5173
 
 ## Estado del Proyecto
 
-- Fase 1: Auth Service + Frontend Básico - Completado
-- Fase 2: Class Service + Sistema de Reservas - Completado
-- Fase 3: Funcionalidades Avanzadas - En desarrollo
+- **Fase 1: Auth Service + Frontend Básico** - Completado
+- **Fase 2: Class Service + Sistema de Reservas** - Completado
+- **Fase 3: Funcionalidades Avanzadas** - Completado
+  - Payment Service: Sistema de pagos y suscripciones
+  - Feedback Service: Sistema de feedback, quejas y notificaciones bidireccionales
+  - Sistema de códigos QR de acceso
+  - Routine Service: Sistema de rutinas y ejercicios personalizados
 
 ## Datos de Prueba
 ### Usuario Admin

@@ -27,5 +27,13 @@ db = db.getSiblingDB(feedbackDbName);
 db.createCollection('feedbacks');
 print('Base de datos ' + feedbackDbName + ' creada');
 
+// Crear base de datos para Routine Service
+var routineDbName = 'gimnasio_routines';
+db = db.getSiblingDB(routineDbName);
+db.createCollection('exercises');
+db.createCollection('routines');
+db.createCollection('userroutines');
+print('Base de datos ' + routineDbName + ' creada');
+
 print('Inicialización de MongoDB completada');
 

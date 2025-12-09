@@ -141,6 +141,13 @@ const Dashboard = () => {
               <button className="card-button">Enviar Feedback</button>
             </div>
 
+            <div className="dashboard-card clickable" onClick={() => window.location.href = '/routines'}>
+              <img src="/rutinas.png" alt="Rutinas" className="dashboard-card-image" />
+              <h3>Rutinas</h3>
+              <p>Explora rutinas de ejercicios y crea la tuya</p>
+              <button className="card-button">Ver Rutinas</button>
+            </div>
+
             {/* Card de Acceso solo visible si tiene suscripcion activa */}
             {!isCheckingSubscription && hasActiveSubscription && (
               <div className="dashboard-card clickable" onClick={() => window.location.href = '/qr'}>
@@ -219,6 +226,13 @@ const Dashboard = () => {
                 <span className="dashboard-badge">{unansweredFeedbacksCount}</span>
               )}
               <button className="card-button">Ver Feedbacks</button>
+            </div>
+
+            <div className="dashboard-card clickable" onClick={() => window.location.href = '/admin/routines'}>
+              <img src="/rutinas.png" alt="Gestión de Rutinas" className="dashboard-card-image" />
+              <h3>Gestión de Rutinas</h3>
+              <p>Gestionar ejercicios y rutinas predefinidas</p>
+              <button className="card-button">Ver Rutinas</button>
             </div>
 
             {/* Card de Acceso siempre visible para administradores */}

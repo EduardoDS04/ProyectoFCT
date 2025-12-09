@@ -35,11 +35,10 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Solo redirigir si NO es un error de cambio de contraseña
-      // Los errores de cambio de contraseña también pueden ser 401 
       const url = error.config?.url || '';
-      if (!url.includes('/change-password')) {
-        // Token expirado o inválido
+      // No redirigir si es un error de login o cambio de contraseña
+      if (!url.includes('/login') && !url.includes('/change-password')) {
+        // Token expirado o inválido - solo redirigir si no estamos en login
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';

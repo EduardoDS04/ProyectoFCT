@@ -19,6 +19,8 @@ import QR from './pages/QR';
 import Feedback from './pages/Feedback';
 import AdminFeedback from './pages/AdminFeedback';
 import NotificationsPage from './pages/NotificationsPage';
+import Routines from './pages/Routines';
+import AdminRoutines from './pages/AdminRoutines';
 import { UserRole } from './types';
 import './App.css';
 
@@ -167,6 +169,23 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <QR />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de Rutinas */}
+        <Route
+          path="/routines"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
+              <Routines />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/routines"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+              <AdminRoutines />
             </ProtectedRoute>
           }
         />

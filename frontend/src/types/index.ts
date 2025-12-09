@@ -45,6 +45,41 @@ export enum FeedbackType {
   DUDA = 'duda'
 }
 
+// Enums para rutinas y ejercicios
+export enum MuscleGroup {
+  PECHO = 'pecho',
+  ESPALDA = 'espalda',
+  HOMBROS = 'hombros',
+  BICEPS = 'biceps',
+  TRICEPS = 'triceps',
+  ANTEBRAZOS = 'antebrazos',
+  CUADRICEPS = 'cuadriceps',
+  ISQUIOTIBIALES = 'isquiotibiales',
+  GEMELO = 'gemelo',
+  GLUTEOS = 'gluteos',
+  LUMBARES = 'lumbares',
+  ABDOMINALES = 'abdominales',
+  CARDIO = 'cardio',
+  FULL_BODY = 'full_body'
+}
+
+// Enum de días de la semana
+export enum DayOfWeek {
+  LUNES = 'lunes',
+  MARTES = 'martes',
+  MIERCOLES = 'miercoles',
+  JUEVES = 'jueves',
+  VIERNES = 'viernes',
+  SABADO = 'sabado',
+  DOMINGO = 'domingo'
+}
+//enum de dificultad
+export enum Difficulty {
+  PRINCIPIANTE = 'principiante',
+  INTERMEDIO = 'intermedio',
+  AVANZADO = 'avanzado'
+}
+
 // Interfaces de Usuario
 export interface User {
   id: string;
@@ -224,6 +259,87 @@ export interface ApiResponse<T = unknown> {
   message?: string;
   data?: T;
   count?: number;
+}
+
+// Interfaces para Rutinas y Ejercicios
+export interface Exercise {
+  _id: string;
+  title: string;
+  description: string;
+  youtubeVideoId: string;
+  muscleGroup: MuscleGroup[];
+  difficulty: Difficulty;
+  thumbnailUrl?: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RoutineExercise {
+  exerciseId: Exercise | string;
+  dayOfWeek: string;
+  sets: number;
+  reps: string;
+  weight?: number;
+}
+
+export interface Routine {
+  _id: string;
+  title: string;
+  description: string;
+  exercises: RoutineExercise[];
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserRoutineExercise {
+  exerciseId: Exercise | string;
+  dayOfWeek: string;
+  sets: number;
+  reps: string;
+  weight?: number;
+  notes?: string;
+}
+
+export interface UserRoutine {
+  _id: string;
+  userId: string;
+  routineName: string;
+  exercises: UserRoutineExercise[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateExerciseData {
+  title: string;
+  description: string;
+  youtubeVideoId: string;
+  muscleGroup: MuscleGroup[];
+  difficulty: Difficulty;
+}
+
+export interface CreateRoutineExerciseData {
+  exerciseId: string;
+  dayOfWeek: string;
+  sets: number;
+  reps: string;
+  weight?: number;
+}
+
+export interface CreateRoutineData {
+  title: string;
+  description: string;
+  exercises: CreateRoutineExerciseData[];
+}
+
+export interface AddExerciseToRoutineData {
+  exerciseId: string;
+  dayOfWeek: string;
+  sets: number;
+  reps: string;
+  weight?: number;
+  notes?: string;
 }
 
 // Context
