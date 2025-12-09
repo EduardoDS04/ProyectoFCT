@@ -350,10 +350,20 @@ El frontend estará disponible en: http://localhost:5173
 
 #### Feedback (Socio)
 - `POST /api/feedback` - Crear nuevo feedback (queja, valoración o duda)
+- `GET /api/feedback/my-feedbacks` - Obtener mis feedbacks con conversaciones
+- `POST /api/feedback/:id/respond` - Responder a un feedback (continuar conversación)
+- `POST /api/feedback/:id/mark-read` - Marcar feedback como leído
+- `GET /api/feedback/unread/count` - Obtener contador de mensajes no leídos
 
 #### Admin
-- `GET /api/feedback` - Obtener todos los feedbacks
+- `GET /api/feedback` - Obtener todos los feedbacks (con filtro de archivados)
 - `GET /api/feedback/:id` - Obtener feedback por ID
+- `POST /api/feedback/:id/respond` - Responder a un feedback
+- `POST /api/feedback/:id/archive` - Archivar/desarchivar feedback
+- `GET /api/feedback/unanswered/count` - Contador de feedbacks sin responder
+- `POST /api/feedback/mark-read` - Marcar todos los feedbacks como leídos
+- `GET /api/feedback/archived/unread/count` - Contador de mensajes no leídos en archivados
+- `POST /api/feedback/mark-archived-read` - Marcar archivados como leídos
 
 ## Características Principales
 ### Autenticación y Autorización
@@ -385,11 +395,28 @@ El frontend estará disponible en: http://localhost:5173
 - Historial de suscripciones
 - Cancelación de suscripciones
 
-### Sistema de Feedback
-- Los socios pueden enviar feedback (quejas, valoraciones o dudas)
-- El admin puede ver todos los feedbacks recibidos con información del usuario
-- Almacenamiento persistente de todos los mensajes en base de datos
-- Filtrado por tipo de feedback (queja, valoración, duda)
+### Sistema de Feedback y Notificaciones
+- **Envío de Feedback**: Los socios pueden enviar feedback (quejas, valoraciones o dudas) con mensajes de hasta 3000 caracteres
+- **Conversaciones Bidireccionales**: Sistema de mensajería bidireccional entre socios y administradores
+- **Notificaciones para Socios**:
+  - Badge en el Navbar con contador de mensajes no leídos
+  - Página de notificaciones con todas las conversaciones
+  - Conversaciones colapsadas por defecto con botón para expandir/colapsar
+  - Formulario de respuesta inline dentro de cada conversación expandida
+  - Marcado automático como leído al abrir las notificaciones
+- **Gestión para Administradores**:
+  - Badge en el Dashboard con contador de feedbacks sin responder
+  - Vista de todos los feedbacks con filtros por tipo (queja, valoración, duda)
+  - Sistema de archivado de conversaciones
+  - Sección de archivados con indicador de mensajes nuevos
+  - Modal de respuesta para cada feedback
+  - Marcado automático como leído al entrar a la sección
+- **Características Técnicas**:
+  - Almacenamiento persistente de todas las conversaciones en base de datos
+  - Ordenamiento automático por fecha del último mensaje
+  - Control de mensajes leídos/no leídos por usuario
+  - Validación de mensajes (máximo 3000 caracteres, sin mínimo)
+  - Historial completo de conversaciones con timestamps
 
 ### Sistema de Códigos QR de Acceso
 - Generación automática de QR único por usuario

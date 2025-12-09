@@ -49,3 +49,8 @@ export interface CreateFeedbackDTO {
   type: FeedbackType;
 }
 
+// DTO para responder a un feedback
+export interface RespondFeedbackDTO {
+  message: string;
+}
+

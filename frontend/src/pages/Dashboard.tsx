@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { UserRole } from '../types';
 import paymentService from '../services/paymentService';
+import feedbackService from '../services/feedbackService';
 import '../styles/Dashboard.css';
 
 // Pagina principal del dashboard que muestra diferentes opciones segun el rol del usuario
 const Dashboard = () => {
   const { user, isLoading: authLoading } = useAuth();
+  const location = useLocation();
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [isCheckingSubscription, setIsCheckingSubscription] = useState(true);
+  const [unansweredFeedbacksCount, setUnansweredFeedbacksCount] = useState(0);
 
   // Verificar si el socio tiene suscripcion activa
   useEffect(() => {
@@ -34,6 +38,37 @@ const Dashboard = () => {
       checkSubscription();
     }
   }, [user?.role, authLoading, user]);
+
+  // Cargar contador de feedbacks sin responder para admin
+  useEffect(() => {
+    const loadUnansweredCount = async () => {
+      if (user?.role === UserRole.ADMIN) {
+        try {
+          const count = await feedbackService.getUnansweredFeedbacksCount();
+          setUnansweredFeedbacksCount(count);
+        } catch (error) {
+          console.error('Error al cargar contador de feedbacks:', error);
+        }
+      }
+    };
+
+    if (!authLoading && user) {
+      loadUnansweredCount();
+      // Actualizar cada 30 segundos
+      const interval = setInterval(loadUnansweredCount, 30000);
+      
+      // Escuchar eventos de respuesta a feedbacks
+      const handleFeedbackResponded = () => {
+        loadUnansweredCount();
+      };
+      window.addEventListener('feedback-responded', handleFeedbackResponded);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('feedback-responded', handleFeedbackResponded);
+      };
+    }
+  }, [user?.role, authLoading, user, location.pathname]);
 
   // Funcion auxiliar para obtener el mensaje de bienvenida segun el rol
   const getWelcomeMessage = (role: UserRole) => {
@@ -180,6 +215,9 @@ const Dashboard = () => {
               <img src="/feedback.png" alt="Gestión de Feedback" className="dashboard-card-image" />
               <h3>Gestión de Feedback</h3>
               <p>Ver todos los feedbacks recibidos</p>
+              {unansweredFeedbacksCount > 0 && (
+                <span className="dashboard-badge">{unansweredFeedbacksCount}</span>
+              )}
               <button className="card-button">Ver Feedbacks</button>
             </div>
 

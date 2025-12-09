@@ -18,6 +18,7 @@ import Payment from './pages/Payment';
 import QR from './pages/QR';
 import Feedback from './pages/Feedback';
 import AdminFeedback from './pages/AdminFeedback';
+import NotificationsPage from './pages/NotificationsPage';
 import { UserRole } from './types';
 import './App.css';
 
@@ -140,6 +141,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
               <Feedback />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
+              <NotificationsPage />
             </ProtectedRoute>
           }
         />

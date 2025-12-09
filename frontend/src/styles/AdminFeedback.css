@@ -150,6 +150,14 @@
   color: white;
 }
 
+/* Icono de archivados sin leer */
+.archived-unread-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  margin-left: 0.5rem;
+}
+
 /* Panel Detalle (Principal) */
 .detail-panel {
   background: #2a2a2a;
@@ -301,6 +309,64 @@
 /* Pie de la tarjeta de feedback */
 .feedback-footer {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #3a3a3a;
+}
+
+.feedback-date {
+  color: #aaa;
+  font-size: 0.875rem;
+}
+
+.btn-respond-feedback {
+  background-color: #656b72;
+  color: #ffffff;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-respond-feedback:hover {
+  background-color: #1a1a1a;
+  border-color: #17769C;
+}
+
+.feedback-footer-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-archive-feedback {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.btn-archive-feedback:hover {
+  opacity: 0.7;
+}
+
+.archive-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.feedback-footer-old {
+  display: flex;
   justify-content: flex-end;
   padding-top: 1rem;
   border-top: 1px solid #3a3a3a;
@@ -378,5 +444,251 @@
   .feedback-type-badge {
     align-self: flex-start;
   }
+}
+
+/* Estilos para conversaciones y respuestas */
+.feedback-has-messages {
+  padding: 0.25rem 0.75rem;
+  background-color: #2E7F85;
+  color: #ffffff;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.feedback-card.selected {
+  border-color: #17769C;
+  box-shadow: 0 0 0 2px rgba(23, 118, 156, 0.3);
+}
+
+.feedback-conversation {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #3a3a3a;
+}
+
+.feedback-conversation h4 {
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.conversation-message {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border-left: 4px solid;
+}
+
+.admin-message {
+  background-color: #1e3a3f;
+  border-left-color: #2E7F85;
+}
+
+.socio-message {
+  background-color: #2a2a3a;
+  border-left-color: #17769C;
+}
+
+.message-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-header strong {
+  color: #ffffff;
+  font-size: 0.875rem;
+}
+
+.message-role {
+  padding: 0.125rem 0.5rem;
+  background-color: #3a3a3a;
+  color: #aaa;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.message-date {
+  color: #aaa;
+  font-size: 0.75rem;
+  margin-left: auto;
+}
+
+.conversation-message p {
+  color: #ffffff;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Estilos para el modal de respuesta */
+.response-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.response-modal {
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid #3a3a3a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.response-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #3a3a3a;
+}
+
+.response-modal-header h3 {
+  color: #ffffff;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.response-modal-close {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.response-modal-close:hover {
+  background-color: #3a3a3a;
+}
+
+.response-modal .response-form {
+  padding: 1.5rem;
+}
+
+/* Estilos para el formulario de respuesta */
+.response-form-container {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  border: 1px solid #3a3a3a;
+}
+
+.response-form-container h3 {
+  color: #ffffff;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.response-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.response-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.response-form label {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.response-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.response-form textarea:focus {
+  outline: none;
+  border-color: #17769C;
+}
+
+.response-form textarea::placeholder {
+  color: #888;
+}
+
+.response-error {
+  padding: 0.75rem;
+  background-color: #4a1a1a;
+  border: 1px solid #8b2a2a;
+  border-radius: 4px;
+  color: #ff6b6b;
+}
+
+.response-error p {
+  margin: 0;
+}
+
+.response-form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn-cancel,
+.btn-submit {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel {
+  background-color: #3a3a3a;
+  color: #ffffff;
+}
+
+.btn-cancel:hover {
+  background-color: #4a4a4a;
+}
+
+.btn-submit {
+  background-color: #17769C;
+  color: #ffffff;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background-color: #1e8fb8;
+}
+
+.btn-submit:disabled {
+  background-color: #3a3a3a;
+  color: #888;
+  cursor: not-allowed;
 }
 

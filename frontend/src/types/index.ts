@@ -174,12 +174,26 @@ export interface CreateSubscriptionData {
 }
 
 // Interfaces de Feedback
+export interface FeedbackMessage {
+  _id: string;
+  senderId: string;
+  senderName: string;
+  senderRole: 'admin' | 'socio';
+  message: string;
+  createdAt: string;
+}
+
 export interface Feedback {
   _id: string;
   userId: string;
   userName: string;
   message: string;
   type: FeedbackType;
+  messages: FeedbackMessage[];
+  lastReadBySocio?: string;
+  lastReadByAdmin?: string;
+  lastReadArchivedByAdmin?: string;
+  archived?: boolean;
   createdAt: string;
   updatedAt?: string;
 }

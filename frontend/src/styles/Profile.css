@@ -68,6 +68,12 @@
   border-bottom: 2px solid #17769C;
 }
 
+.profile-description {
+  color: #aaa;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
 /* Contenedor de informacion del perfil */
 .profile-info {
   display: flex;

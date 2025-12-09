@@ -1,5 +1,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import feedbackService from '../services/feedbackService';
 import '../styles/Navbar.css';
 
 // Componente de navegacion principal de la aplicacion
@@ -8,6 +10,38 @@ const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Cargar contador de notificaciones para socios
+  useEffect(() => {
+    if (isAuthenticated && user?.role === 'socio') {
+      loadUnreadCount();
+      // Actualizar cada 30 segundos
+      const interval = setInterval(loadUnreadCount, 30000);
+      
+      // Escuchar eventos de actualización de notificaciones
+      const handleNotificationsUpdate = () => {
+        loadUnreadCount();
+      };
+      window.addEventListener('notifications-opened', handleNotificationsUpdate);
+      window.addEventListener('notifications-updated', handleNotificationsUpdate);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('notifications-opened', handleNotificationsUpdate);
+        window.removeEventListener('notifications-updated', handleNotificationsUpdate);
+      };
+    }
+  }, [isAuthenticated, user, location.pathname]);
+
+  const loadUnreadCount = async () => {
+    try {
+      const count = await feedbackService.getUnreadNotificationsCount();
+      setUnreadCount(count);
+    } catch (error) {
+      console.error('Error al cargar contador de notificaciones:', error);
+    }
+  };
 
   // Funcion para cerrar sesion y redirigir al login
   const handleLogout = () => {
@@ -47,10 +81,17 @@ const Navbar = () => {
                   Mis Reservas
                 </Link>
               )}
-              {/* Enlace a suscripción, solo visible para socios */}
+              {/* Enlace a notificaciones, solo visible para socios */}
               {user?.role === 'socio' && (
-                <Link to="/payment" className="navbar-link">
-                  Suscripción
+                <Link 
+                  to="/notifications" 
+                  className="navbar-link navbar-link-with-badge"
+                  onClick={loadUnreadCount}
+                >
+                  Notificaciones
+                  {unreadCount > 0 && (
+                    <span className="navbar-badge">{unreadCount}</span>
+                  )}
                 </Link>
               )}
               {/* Enlace al perfil del usuario */}

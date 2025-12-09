@@ -21,9 +21,15 @@ const Feedback = () => {
     setError('');
     setSuccess(false);
 
-    // Validar que el mensaje tenga al menos 10 caracteres
-    if (message.trim().length < 10) {
-      setError('El mensaje debe tener al menos 10 caracteres');
+    // Validar que el mensaje no esté vacío
+    if (message.trim().length === 0) {
+      setError('El mensaje no puede estar vacío');
+      return;
+    }
+
+    // Validar máximo de caracteres (3000)
+    if (message.trim().length > 3000) {
+      setError('El mensaje no puede exceder 3000 caracteres');
       return;
     }
 
@@ -91,13 +97,12 @@ const Feedback = () => {
               onChange={(e) => setMessage(e.target.value)}
               className="form-textarea"
               rows={6}
-              placeholder="Escribe tu mensaje aquí (mínimo 10 caracteres)..."
+              placeholder="Escribe tu mensaje aquí (máximo 3000 caracteres)..."
               required
-              minLength={10}
-              maxLength={1000}
+              maxLength={3000}
             />
             <span className="form-helper">
-              {message.length}/1000 caracteres
+              {message.length}/3000 caracteres
             </span>
           </div>
 
@@ -105,7 +110,7 @@ const Feedback = () => {
             <button
               type="submit"
               className="btn-primary"
-              disabled={isLoading || message.trim().length < 10}
+              disabled={isLoading || message.trim().length === 0}
             >
               {isLoading ? 'Enviando...' : 'Enviar Feedback'}
             </button>
