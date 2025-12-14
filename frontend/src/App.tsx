@@ -1,35 +1,217 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './hooks/useAuth';
+import Navbar from './components/Navbar';
+import ProtectedRoute from './components/ProtectedRoute';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
+import Classes from './pages/Classes';
+import ClassForm from './pages/ClassForm';
+import MyClasses from './pages/MyClasses';
+import MyBookings from './pages/MyBookings';
+import ClassBookings from './pages/ClassBookings';
+import AllBookings from './pages/AllBookings';
+import AdminUsers from './pages/AdminUsers';
+import Payment from './pages/Payment';
+import QR from './pages/QR';
+import Feedback from './pages/Feedback';
+import AdminFeedback from './pages/AdminFeedback';
+import NotificationsPage from './pages/NotificationsPage';
+import Routines from './pages/Routines';
+import AdminRoutines from './pages/AdminRoutines';
+import { UserRole } from './types';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+function AppRoutes() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        fontSize: '1.5rem'
+      }}>
+        Cargando...
+      </div>
+    );
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route 
+          path="/login" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
+        />
+        <Route 
+          path="/register" 
+          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} 
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de Clases */}
+        <Route
+          path="/classes"
+          element={
+            <ProtectedRoute>
+              <Classes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/classes/create"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.MONITOR, UserRole.ADMIN]}>
+              <ClassForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/classes/edit/:id"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.MONITOR, UserRole.ADMIN]}>
+              <ClassForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/classes/my-classes"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.MONITOR, UserRole.ADMIN]}>
+              <MyClasses />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de Reservas */}
+        <Route
+          path="/bookings"
+          element={
+            <ProtectedRoute>
+              <MyBookings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bookings/class/:classId"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.MONITOR, UserRole.ADMIN]}>
+              <ClassBookings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/bookings"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+              <AllBookings />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de Administración */}
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+              <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de Feedback */}
+        <Route
+          path="/admin/feedback"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+              <AdminFeedback />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/feedback"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
+              <Feedback />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
+              <NotificationsPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de Pagos */}
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
+              <Payment />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de QR */}
+        <Route
+          path="/qr"
+          element={
+            <ProtectedRoute>
+              <QR />
+            </ProtectedRoute>
+          }
+        />
+        {/* Rutas de Rutinas */}
+        <Route
+          path="/routines"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.SOCIO]}>
+              <Routines />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/routines"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+              <AdminRoutines />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </Router>
+  );
+}
+
+export default App;

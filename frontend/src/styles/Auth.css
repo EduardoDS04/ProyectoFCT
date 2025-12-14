@@ -1,0 +1,145 @@
+/* Estilos para las paginas de autenticacion (login y registro) */
+
+/* Contenedor principal con fondo oscuro */
+.auth-container {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #1a1a1a;
+  padding: 2rem;
+}
+
+/* Tarjeta del formulario */
+.auth-card {
+  background: #2a2a2a;
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid #3a3a3a;
+}
+
+/* Titulo principal */
+.auth-title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+/* Subtitulo descriptivo */
+.auth-subtitle {
+  color: #cccccc;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Mensaje de error */
+.auth-error {
+  background: #4a1a1a;
+  color: #ff6b6b;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #ff6b6b;
+}
+
+/* Formulario de autenticacion */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Grupo de campos del formulario */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #cccccc;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.8rem;
+  border: 2px solid #3a3a3a;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #17769C;
+}
+
+.form-group input:disabled,
+.form-group select:disabled {
+  background: #0a0a0a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-group input::placeholder {
+  color: #666666;
+}
+
+.form-group small {
+  color: #999999;
+  font-size: 0.85rem;
+}
+
+/* Boton principal de envio */
+.auth-button {
+  background: #17769C;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.auth-button:hover:not(:disabled) {
+  background: #1e8bb3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(23, 118, 156, 0.4);
+}
+
+.auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pie del formulario con enlace */
+.auth-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #cccccc;
+}
+
+/* Enlace en el pie */
+.auth-footer a {
+  color: #17769C;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.auth-footer a:hover {
+  color: #1e8bb3;
+  text-decoration: underline;
+}
+

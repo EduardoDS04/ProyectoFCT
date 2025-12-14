@@ -12,8 +12,6 @@
     "sourceMap": true,
     "declaration": false,
     "declarationMap": false,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
     "strict": true,
     "verbatimModuleSyntax": false,
     "isolatedModules": true,

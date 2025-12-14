@@ -1,0 +1,461 @@
+/* Estilos para la pagina de gestion de usuarios del administrador */
+
+/* Contenedor principal */
+.admin-users-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #1a1a1a;
+  min-height: calc(100vh - 80px);
+}
+
+/* Estilos responsive para tablets */
+@media (max-width: 1024px) {
+  .master-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .master-panel {
+    position: static;
+  }
+
+  .master-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .master-item {
+    flex: 1;
+    min-width: 150px;
+  }
+}
+
+/* Encabezado de la pagina */
+.admin-users-header {
+  margin-bottom: 2rem;
+}
+
+.admin-users-header h1 {
+  font-size: 2.5rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+/* Grid de estadisticas */
+.users-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Tarjeta de estadistica */
+.stat-card {
+  background: #2a2a2a;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  border: 1px solid #3a3a3a;
+}
+
+.stat-card h3 {
+  font-size: 0.9rem;
+  color: #cccccc;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-card p {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #17769C;
+  margin: 0;
+}
+
+/* Layout Maestro-Detalle */
+.master-detail-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Panel Maestro (Lateral) */
+.master-panel {
+  background: #2a2a2a;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+  border: 1px solid #3a3a3a;
+}
+
+.master-panel h2 {
+  font-size: 1.2rem;
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #3a3a3a;
+}
+
+/* Título del  maestro detalle con flecha desplegable */
+.master-panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+
+.master-panel-title:hover {
+  color: #17769C;
+}
+
+/* Flecha desplegable */
+.dropdown-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+  color: #cccccc;
+  display: inline-block;
+}
+
+.dropdown-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+/* Lista de usuarios */
+.master-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Item individual del panel maestro */
+.master-item {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid transparent;
+  background: #1a1a1a;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: left;
+  color: #cccccc;
+}
+
+.master-item:hover {
+  background: #333333;
+  border-color: #17769C;
+}
+
+.master-item.active {
+  background: #17769C;
+  border-color: #17769C;
+  color: white;
+}
+
+/* Contenido del item maestro */
+.master-item-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Etiqueta del item maestro */
+.master-item-label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.master-item.active .master-item-label {
+  color: white;
+}
+
+/* Contador del item maestro */
+.master-item-count {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.master-item.active .master-item-count {
+  color: white;
+}
+
+/* Panel Detalle (Principal) */
+.detail-panel {
+  background: #2a2a2a;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem;
+  border: 1px solid #3a3a3a;
+}
+
+/* Encabezado del panel detalle */
+.detail-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #3a3a3a;
+}
+
+.detail-header h2 {
+  font-size: 1.5rem;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Contenedor de la tabla de usuarios */
+.users-table-container {
+  background: #2a2a2a;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  overflow-x: auto;
+  border: 1px solid #3a3a3a;
+}
+
+/* Tabla de usuarios */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-table thead {
+  background: #1a1a1a;
+}
+
+.users-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #ffffff;
+  border-bottom: 2px solid #3a3a3a;
+}
+
+.users-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #3a3a3a;
+  color: #cccccc;
+}
+
+.users-table tbody tr:hover {
+  background: #333333;
+}
+
+/* Etiqueta del rol del usuario */
+.role-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.role-badge.admin {
+  background: #fee;
+  color: #c33;
+}
+
+.role-badge.monitor {
+  background: #eef;
+  color: #339;
+}
+
+.role-badge.socio {
+  background: #efe;
+  color: #393;
+}
+
+/* Selector de rol */
+.role-select {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 2px solid #3a3a3a;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  min-width: 100px;
+  max-width: 160px;
+}
+
+.role-select:hover {
+  border-color: #17769C;
+}
+
+.role-select:focus {
+  outline: none;
+  border-color: #17769C;
+}
+
+.role-select option {
+  background: #2a2a2a;
+  color: #ffffff;
+}
+
+/* Estado activo del usuario */
+.status-active {
+  color: #22c55e;
+  font-weight: 600;
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+/* Estado inactivo del usuario */
+.status-inactive {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* Mensaje cuando no hay usuarios */
+.no-users {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+/* Mensaje de error */
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #c33;
+}
+
+/* Mensaje de éxito */
+.success-message {
+  background: #efe;
+  color: #393;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #393;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Botón de dar de baja usuario */
+.btn-deactivate-user {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-deactivate-user:hover {
+  opacity: 0.7;
+}
+
+.btn-deactivate-user img {
+  display: block;
+}
+
+/* Botón de eliminar usuario definitivamente */
+.btn-delete-user {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: 0.25rem;
+}
+
+.btn-delete-user:hover {
+  opacity: 0.7;
+}
+
+.btn-delete-user img {
+  display: block;
+}
+
+/* Modal de confirmación */
+.admin-users-container .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.admin-users-container .modal-content {
+  background: #2a2a2a !important;
+  border-radius: 10px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid #3a3a3a;
+}
+
+.admin-users-container .modal-content h3 {
+  color: #ffffff !important;
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.admin-users-container .modal-content p {
+  color: #ffffff !important;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.admin-users-container .modal-content p strong {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.admin-users-container .modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.admin-users-container .btn-cancel-modal,
+.admin-users-container .btn-confirm-modal {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.admin-users-container .btn-cancel-modal {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #3a3a3a !important;
+}
+
+.admin-users-container .btn-cancel-modal:hover {
+  background: #000000 !important;
+  border-color: #3a3a3a !important;
+}
+
+.admin-users-container .btn-confirm-modal {
+  background: #dc3545 !important;
+  color: white !important;
+}
+

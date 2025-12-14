@@ -1,0 +1,165 @@
+/* Estilos para el formulario de creacion/edicion de clases */
+
+/* Contenedor principal del formulario */
+.class-form-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #1a1a1a;
+  min-height: calc(100vh - 80px);
+}
+
+/* Tarjeta del formulario */
+.class-form-card {
+  background: #2a2a2a;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid #3a3a3a;
+}
+
+.class-form-card h1 {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Formulario principal */
+.class-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Grupo de campos del formulario */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #cccccc;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 0.8rem;
+  border: 2px solid #3a3a3a;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #1a1a1a;
+  color: #ffffff;
+  transition: border-color 0.3s;
+  font-family: inherit;
+}
+
+/* Estado de foco en los campos del formulario */
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #17769C; /* Borde azul cuando el campo esta activo */
+}
+
+/* Estado deshabilitado de los campos */
+.form-group input:disabled,
+.form-group textarea:disabled {
+  background: #0a0a0a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Fila de campos en dos columnas */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Botones de accion del formulario */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.form-actions button {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Boton principal (crear/guardar) */
+.form-actions .btn-primary {
+  background: #17769C;
+  color: white;
+}
+
+/* Efecto hover del boton principal */
+.form-actions .btn-primary:hover:not(:disabled) {
+  background: #1e8bb3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(23, 118, 156, 0.4);
+}
+
+/* Estado deshabilitado del boton principal */
+.form-actions .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Boton secundario (cancelar) */
+.form-actions .btn-secondary {
+  background: #dc3545;
+  color: white;
+}
+
+/* Efecto hover del boton secundario */
+.form-actions .btn-secondary:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* Mensaje de error */
+.error-message {
+  background: #4a1a1a;
+  color: #ff6b6b;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #ff6b6b;
+}
+
+/* Estilos responsive para moviles */
+@media (max-width: 768px) {
+  .class-form-container {
+    padding: 1rem;
+  }
+
+  .class-form-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}
+
