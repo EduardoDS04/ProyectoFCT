@@ -49,7 +49,7 @@ export const verifyToken = async (
 
     // Agregar informacion del usuario al request
     const user = response.data.data;
-    req.userId = user._id;
+    req.userId = String(user.id || user._id);
     req.userRole = user.role;
     req.userEmail = user.email;
     req.userName = user.name;

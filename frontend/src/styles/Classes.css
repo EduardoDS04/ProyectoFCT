@@ -242,6 +242,22 @@
   background: #45a049 !important;
 }
 
+.class-actions .btn-delete {
+  padding: 0.8rem 1.2rem;
+  background: #dc3545 !important;
+  color: white !important;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.class-actions .btn-delete:hover {
+  transform: scale(1.05);
+  background: #c82333 !important;
+}
+
 .booking-disabled {
   text-align: center;
   padding: 0.8rem;

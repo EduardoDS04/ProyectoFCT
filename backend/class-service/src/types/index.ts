@@ -55,7 +55,8 @@ export interface CreateBookingDTO {
 export interface AuthServiceUserResponse {
   success: boolean;
   data: {
-    _id: string;
+    id?: string;
+    _id?: string;
     email: string;
     name: string;
     role: UserRole;

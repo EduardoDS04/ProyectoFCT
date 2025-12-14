@@ -224,6 +224,19 @@ const Classes = () => {
     }
   };
 
+  // Manejar la eliminación permanente de una clase (solo admin)
+  const handleDeleteClass = async (id: string, name: string) => {
+    if (window.confirm(`¿Seguro que quieres ELIMINAR permanentemente la clase "${name}"?\n\nEsta acción no se puede deshacer.`)) {
+      try {
+        await classService.deleteClass(id);
+        alert('Clase eliminada exitosamente');
+        loadClasses();
+      } catch (err) {
+        alert(getErrorMessage(err, 'Error al eliminar la clase'));
+      }
+    }
+  };
+
   // Formatear fecha para mostrar en la interfaz
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -449,6 +462,17 @@ const Classes = () => {
                             className="btn-cancel"
                           >
                             Cancelar
+                          </button>
+                        )}
+                        {/* Botón eliminar solo para admin, en clases canceladas o completadas sin participantes */}
+                        {user?.role === 'admin' && 
+                         (classItem.status === 'cancelled' || classItem.status === 'completed') &&
+                         classItem.currentParticipants === 0 && (
+                          <button
+                            onClick={() => handleDeleteClass(classItem._id, classItem.name)}
+                            className="btn-delete"
+                          >
+                            Eliminar
                           </button>
                         )}
                         <button

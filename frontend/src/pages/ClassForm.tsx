@@ -1,9 +1,9 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useCallback, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import classService from '../services/classService';
 import { getErrorMessage } from '../utils/errorHandler';
-import type { CreateClassData } from '../types';
+import type { CreateClassData, User } from '../types';
 import '../styles/ClassForm.css';
 
 // Formulario para crear o editar una clase
@@ -24,25 +24,21 @@ const ClassForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Cargar datos de la clase si estamos en modo edicion
-  useEffect(() => {
-    if (isEdit && id && user) {
-      loadClass();
-    }
-  }, [id, isEdit, user]);
-
   // Cargar datos de la clase para edicion
-  const loadClass = async () => {
+  const loadClass = useCallback(async () => {
     try {
-      if (!user) {
+      if (!user || !id) {
         return;
       }
 
-      const classData = await classService.getClassById(id!);
+      const classData = await classService.getClassById(id);
       
-      // Verificar permisos - convertir ambos IDs a string para comparación segura
-      const monitorIdStr = String(classData.monitorId);
-      const userIdStr = String(user.id);
+      // Verificar permisos - normalizar ambos IDs para comparación segura
+      // Manejar tanto id como _id por compatibilidad
+      const userWithId = user as User & { _id?: string };
+      const userId = user.id || userWithId._id || '';
+      const monitorIdStr = String(classData.monitorId || '').trim().toLowerCase();
+      const userIdStr = String(userId).trim().toLowerCase();
       
       if (user.role !== 'admin' && monitorIdStr !== userIdStr) {
         alert('No tienes permisos para editar esta clase');
@@ -80,7 +76,14 @@ const ClassForm = () => {
       setError('Error al cargar la clase');
       console.error(err);
     }
-  };
+  }, [user, id, navigate]);
+
+  // Cargar datos de la clase si estamos en modo edicion
+  useEffect(() => {
+    if (isEdit && id && user) {
+      loadClass();
+    }
+  }, [isEdit, id, user, loadClass]);
 
   // Manejar cambios en los campos del formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

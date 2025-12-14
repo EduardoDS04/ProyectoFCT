@@ -241,7 +241,18 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
 
     res.status(200).json({
       success: true,
-      data: user
+      data: {
+        id: String(user._id),
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        phone: user.phone,
+        isActive: user.isActive,
+        dni: user.dni,
+        birthDate: user.birthDate,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
     });
   } catch (error) {
     console.error('Error al obtener perfil:', error);
@@ -309,7 +320,18 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
     res.status(200).json({
       success: true,
       message: 'Perfil actualizado exitosamente',
-      data: user
+      data: {
+        id: String(user._id),
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        phone: user.phone,
+        isActive: user.isActive,
+        dni: user.dni,
+        birthDate: user.birthDate,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
     });
   } catch (error) {
     console.error('Error al actualizar perfil:', error);

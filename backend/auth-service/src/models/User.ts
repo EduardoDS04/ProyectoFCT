@@ -13,6 +13,8 @@ export interface IUserDocument extends Document {
   isActive: boolean;
   qrToken?: string; // Token unico para el QR de acceso
   qrGeneratedAt?: Date; // Fecha de generacion del QR (para validar expiracion de 24h)
+  createdAt?: Date; // Agregado automaticamente por timestamps
+  updatedAt?: Date; // Agregado automaticamente por timestamps
 }
 
 // Esquema de Mongoose para el modelo User
