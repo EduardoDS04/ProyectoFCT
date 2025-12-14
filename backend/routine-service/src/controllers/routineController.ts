@@ -2,6 +2,7 @@ import { Response } from 'express';
 import Routine from '../models/Routine';
 import Exercise from '../models/Exercise';
 import { AuthRequest, ApiResponse } from '../types';
+import { EXERCISE_POPULATE_FIELDS, handleValidationError, validateExercisesExist } from '../utils/helpers';
 
 // Obtener todas las rutinas predefinidas con ejercicios
 export const getAllRoutines = async (
@@ -10,10 +11,14 @@ export const getAllRoutines = async (
 ): Promise<void> => {
   try {
     const routines = await Routine.find()
-    //Reemplaza los IDs de ejercicios por sus datos completos (solo los campos especificados)
-      .populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl')
+      // populate: Reemplaza las referencias de ejercicios (exerciseId) con los documentos completos
+      // Solo incluye los campos especificados en EXERCISE_POPULATE_FIELDS para optimizar la consulta
+      .populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS)
+      // select: Excluye el campo __v (versión del documento) de los resultados para limpiar la respuesta
       .select('-__v')
+      // sort: Ordena los resultados por fecha de creación descendente (más recientes primero)
       .sort({ createdAt: -1 })
+      // lean: Convierte los documentos Mongoose a objetos JavaScript planos, mejorando el rendimiento
       .lean();
 
     res.status(200).json({
@@ -38,7 +43,7 @@ export const getRoutineById = async (
     const { id } = req.params;
 
     const routine = await Routine.findById(id)
-      .populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl')
+      .populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS)
       .select('-__v')
       .lean();
 
@@ -93,8 +98,8 @@ export const createRoutine = async (
 
     // Verificar que todos los ejercicios existan
     const exerciseIds = exercises.map((ex: any) => ex.exerciseId);
-    const existingExercises = await Exercise.find({ _id: { $in: exerciseIds } });
-    if (existingExercises.length !== exerciseIds.length) {
+    const exercisesExist = await validateExercisesExist(exerciseIds);
+    if (!exercisesExist) {
       res.status(400).json({
         success: false,
         message: 'Uno o más ejercicios no existen'
@@ -112,7 +117,7 @@ export const createRoutine = async (
     await routine.save();
 
     // obtener ejercicios para la respuesta
-    await routine.populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl');
+    await routine.populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS);
 
     res.status(201).json({
       success: true,
@@ -122,14 +127,7 @@ export const createRoutine = async (
   } catch (error: any) {
     console.error('Error al crear rutina:', error);
     
-    if (error.name === 'ValidationError' && error.errors) {
-      const firstError = Object.values(error.errors)[0] as { message?: string };
-      res.status(400).json({
-        success: false,
-        message: firstError?.message || 'Error de validación'
-      });
-      return;
-    }
+    if (handleValidationError(error, res)) return;
 
     res.status(500).json({
       success: false,
@@ -174,8 +172,8 @@ export const updateRoutine = async (
       
       // Verificar que todos los ejercicios existan
       const exerciseIds = exercises.map((ex: any) => ex.exerciseId);
-      const existingExercises = await Exercise.find({ _id: { $in: exerciseIds } });
-      if (existingExercises.length !== exerciseIds.length) {
+      const exercisesExist = await validateExercisesExist(exerciseIds);
+      if (!exercisesExist) {
         res.status(400).json({
           success: false,
           message: 'Uno o más ejercicios no existen'
@@ -186,7 +184,7 @@ export const updateRoutine = async (
     }
 
     await routine.save();
-    await routine.populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl');
+    await routine.populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS);
 
     res.status(200).json({
       success: true,
@@ -196,14 +194,7 @@ export const updateRoutine = async (
   } catch (error: any) {
     console.error('Error al actualizar rutina:', error);
     
-    if (error.name === 'ValidationError' && error.errors) {
-      const firstError = Object.values(error.errors)[0] as { message?: string };
-      res.status(400).json({
-        success: false,
-        message: firstError?.message || 'Error de validación'
-      });
-      return;
-    }
+    if (handleValidationError(error, res)) return;
 
     res.status(500).json({
       success: false,

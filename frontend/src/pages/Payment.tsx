@@ -136,7 +136,7 @@ const Payment = () => {
       
       setActiveSubscription(newSubscription);
       setSuccess(true);
-      // Redirigir al Dashboard después de 2 segundos para que aparezca el card "Acceso"
+      // Redirigir al menú principal después de 2 segundos para que aparezca el card "Acceso"
       setTimeout(() => {
         navigate('/dashboard');
       }, 2000);
@@ -224,7 +224,7 @@ const Payment = () => {
     try {
       await paymentService.cancelSubscription(activeSubscription._id);
       setActiveSubscription(null);
-      // Redirigir al Dashboard para que desaparezca el card "Acceso"
+      // Redirigir al menú principal para que desaparezca el card "Acceso"
       navigate('/dashboard');
     } catch (err) {
       setError(getErrorMessage(err, 'Error al cancelar la suscripción'));
@@ -244,7 +244,7 @@ const Payment = () => {
         <div className="payment-card">
           <div className="payment-success">
             <h2>¡Pago realizado exitosamente!</h2>
-            <p>Tu suscripción ha sido activada. Redirigiendo al dashboard...</p>
+            <p>Tu suscripción ha sido activada. Redirigiendo al menú principal...</p>
           </div>
         </div>
       </div>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import classService from '../services/classService';
 import { getErrorMessage, isNetworkError } from '../utils/errorHandler';
 import type { Class } from '../types';
+import { ClassStatus } from '../types';
 import '../styles/MyClasses.css';
 
 // Pagina donde monitores y administradores pueden gestionar las clases que han creado
@@ -10,20 +12,29 @@ const MyClasses = () => {
   const [classes, setClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [filter, setFilter] = useState<ClassStatus | 'all'>('all');
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // Cargar clases al montar el componente
+  // Cargar clases al montar el componente y cuando cambia el filtro
   useEffect(() => {
     loadMyClasses();
-  }, []);
+  }, [filter]);
 
   // Cargar las clases creadas por el usuario actual
   const loadMyClasses = async () => {
     try {
       setLoading(true);
       setError(''); // Limpiar error previo
-      const data = await classService.getMyClasses();
-      const sortedClasses = data.sort((a, b) => 
+      const allData = await classService.getMyClasses();
+      
+      // Aplicar filtro
+      let filteredData = allData;
+      if (filter !== 'all') {
+        filteredData = allData.filter(c => c.status === filter);
+      }
+      
+      const sortedClasses = filteredData.sort((a, b) => 
         new Date(b.schedule).getTime() - new Date(a.schedule).getTime()
       );
       setClasses(sortedClasses);
@@ -98,14 +109,43 @@ const MyClasses = () => {
         </button>
       </div>
 
+      <div className="classes-filters">
+        <button 
+          className={filter === 'all' ? 'filter-btn active' : 'filter-btn'}
+          onClick={() => setFilter('all')}
+        >
+          Todas
+        </button>
+        <button 
+          className={filter === ClassStatus.ACTIVE ? 'filter-btn active' : 'filter-btn'}
+          onClick={() => setFilter(ClassStatus.ACTIVE)}
+        >
+          Confirmadas
+        </button>
+        <button 
+          className={filter === ClassStatus.CANCELLED ? 'filter-btn active' : 'filter-btn'}
+          onClick={() => setFilter(ClassStatus.CANCELLED)}
+        >
+          Canceladas
+        </button>
+        <button 
+          className={filter === ClassStatus.COMPLETED ? 'filter-btn active' : 'filter-btn'}
+          onClick={() => setFilter(ClassStatus.COMPLETED)}
+        >
+          Completadas
+        </button>
+      </div>
+
       {error && <div className="error-message">{error}</div>}
 
       {classes.length === 0 ? (
         <div className="no-classes">
-          <p>No tienes clases creadas aún</p>
-          <button onClick={() => navigate('/classes/create')} className="btn-primary">
-            Crear Mi Primera Clase
-          </button>
+          <p>No tienes clases {filter !== 'all' ? `con estado ${filter === ClassStatus.ACTIVE ? 'confirmadas' : filter === ClassStatus.CANCELLED ? 'canceladas' : 'completadas'}` : 'creadas aún'}</p>
+          {filter === 'all' && (
+            <button onClick={() => navigate('/classes/create')} className="btn-primary">
+              Crear Mi Primera Clase
+            </button>
+          )}
         </div>
       ) : (
         <div className="classes-table-container">
@@ -166,7 +206,9 @@ const MyClasses = () => {
                         </button>
                       </>
                     )}
-                    {classItem.status === 'cancelled' && classItem.currentParticipants === 0 && (
+                    {user?.role === 'admin' && 
+                     classItem.status === 'cancelled' && 
+                     classItem.currentParticipants === 0 && (
                       <button
                         onClick={() => handleDeleteClass(classItem._id, classItem.name)}
                         className="btn-action delete"

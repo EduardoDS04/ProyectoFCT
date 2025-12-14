@@ -1,16 +1,5 @@
 import api from './api';
-import type { User, ApiResponse } from '../types';
-
-interface UserStats {
-  total: number;
-  active: number;
-  inactive: number;
-  byRole: {
-    socios: number;
-    monitores: number;
-    admins: number;
-  };
-}
+import type { User, ApiResponse, UserRole } from '../types';
 
 class AdminService {
   /**
@@ -22,11 +11,24 @@ class AdminService {
   }
 
   /**
-   * Obtener estadísticas del sistema
+   * Cambiar el rol de un usuario
    */
-  async getStats(): Promise<UserStats> {
-    const response = await api.get<ApiResponse<UserStats>>('/api/admin/stats');
-    return response.data.data!;
+  async updateUserRole(userId: string, role: UserRole): Promise<void> {
+    await api.put<ApiResponse>(`/api/admin/users/${userId}/role`, { role });
+  }
+
+  /**
+   * Activar/desactivar usuario
+   */
+  async toggleUserActive(userId: string): Promise<void> {
+    await api.put<ApiResponse>(`/api/admin/users/${userId}/toggle-active`);
+  }
+
+  /**
+   * Eliminar usuario definitivamente
+   */
+  async deleteUser(userId: string): Promise<void> {
+    await api.delete<ApiResponse>(`/api/admin/users/${userId}`);
   }
 }
 

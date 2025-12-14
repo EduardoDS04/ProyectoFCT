@@ -1,7 +1,5 @@
+// configuración de conexión a mongodb para el servicio de rutinas
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const connectDB = async (): Promise<void> => {
   try {

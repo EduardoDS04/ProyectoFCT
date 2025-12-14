@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import Exercise from '../models/Exercise';
-import { AuthRequest, ApiResponse, MuscleGroup } from '../types';
+import { AuthRequest, ApiResponse } from '../types';
+import { handleValidationError, validateMuscleGroups } from '../utils/helpers';
 
 // Obtener todos los ejercicios (público)
 export const getAllExercises = async (
@@ -88,10 +89,11 @@ export const createExercise = async (
     }
 
     // Validar que muscleGroup sea un array con al menos un elemento
-    if (!Array.isArray(muscleGroup) || muscleGroup.length === 0) {
+    const muscleGroupValidation = validateMuscleGroups(muscleGroup);
+    if (!muscleGroupValidation.valid) {
       res.status(400).json({
         success: false,
-        message: 'Debe seleccionar al menos un grupo muscular'
+        message: 'Debe seleccionar al menos un grupo muscular válido'
       });
       return;
     }
@@ -106,24 +108,11 @@ export const createExercise = async (
       return;
     }
 
-    // Validar que todos los grupos musculares sean válidos
-    const validGroups = muscleGroup.filter((group: string) => 
-      Object.values(MuscleGroup).includes(group as MuscleGroup)
-    );
-    
-    if (validGroups.length === 0) {
-      res.status(400).json({
-        success: false,
-        message: 'Debe seleccionar al menos un grupo muscular válido'
-      });
-      return;
-    }
-
     const exercise = new Exercise({
       title,
       description,
       youtubeVideoId,
-      muscleGroup: validGroups,
+      muscleGroup: muscleGroupValidation.groups,
       difficulty,
       createdBy: req.userId
     });
@@ -138,14 +127,7 @@ export const createExercise = async (
   } catch (error: any) {
     console.error('Error al crear ejercicio:', error);
     
-    if (error.name === 'ValidationError' && error.errors) {
-      const firstError = Object.values(error.errors)[0] as { message?: string };
-      res.status(400).json({
-        success: false,
-        message: firstError?.message || 'Error de validación'
-      });
-      return;
-    }
+    if (handleValidationError(error, res)) return;
 
     res.status(500).json({
       success: false,
@@ -178,26 +160,15 @@ export const updateExercise = async (
     if (description) exercise.description = description;
     if (youtubeVideoId) exercise.youtubeVideoId = youtubeVideoId;
     if (muscleGroup) {
-      // Validar que muscleGroup sea un array con al menos un elemento
-      if (!Array.isArray(muscleGroup) || muscleGroup.length === 0) {
-        res.status(400).json({
-          success: false,
-          message: 'Debe seleccionar al menos un grupo muscular'
-        });
-        return;
-      }
-      // Validar que todos los grupos musculares sean válidos
-      const validGroups = muscleGroup.filter((group: string) => 
-        Object.values(MuscleGroup).includes(group as MuscleGroup)
-      );
-      if (validGroups.length === 0) {
+      const muscleGroupValidation = validateMuscleGroups(muscleGroup);
+      if (!muscleGroupValidation.valid) {
         res.status(400).json({
           success: false,
           message: 'Debe seleccionar al menos un grupo muscular válido'
         });
         return;
       }
-      exercise.muscleGroup = validGroups;
+      exercise.muscleGroup = muscleGroupValidation.groups;
     }
     if (difficulty) exercise.difficulty = difficulty;
 
@@ -211,14 +182,7 @@ export const updateExercise = async (
   } catch (error: any) {
     console.error('Error al actualizar ejercicio:', error);
     
-    if (error.name === 'ValidationError' && error.errors) {
-      const firstError = Object.values(error.errors)[0] as { message?: string };
-      res.status(400).json({
-        success: false,
-        message: firstError?.message || 'Error de validación'
-      });
-      return;
-    }
+    if (handleValidationError(error, res)) return;
 
     res.status(500).json({
       success: false,

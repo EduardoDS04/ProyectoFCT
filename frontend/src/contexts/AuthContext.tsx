@@ -60,13 +60,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (response.success && response.data) {
         const { token: newToken, user: userData } = response.data;
         
+        // crear objeto User completo con isActive por defecto 
+        const completeUser: User = {
+          ...userData,
+          isActive: true // por defecto, si el usuario puede iniciar sesión, está activo
+        };
+        
         // Guardar token y usuario en localStorage para persistir la sesion
         authService.setToken(newToken);
-        authService.setUser(userData);
+        authService.setUser(completeUser);
         
         // Actualizar el estado del contexto
         setToken(newToken);
-        setUser(userData as User);
+        setUser(completeUser);
       } else {
         throw new Error(response.message || 'Error al iniciar sesión');
       }
@@ -83,13 +89,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (response.success && response.data) {
         const { token: newToken, user: userData } = response.data;
         
+        // crear objeto User completo con isActive por defecto
+        const completeUser: User = {
+          ...userData,
+          isActive: true // por defecto, si el usuario puede registrarse, está activo
+        };
+        
         // Guardar token y usuario en localStorage
         authService.setToken(newToken);
-        authService.setUser(userData);
+        authService.setUser(completeUser);
         
         // Actualizar el estado del contexto
         setToken(newToken);
-        setUser(userData as User);
+        setUser(completeUser);
       } else {
         throw new Error(response.message || 'Error al registrar usuario');
       }

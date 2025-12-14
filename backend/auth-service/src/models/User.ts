@@ -7,6 +7,7 @@ export interface IUserDocument extends Document {
   password: string;
   name: string;
   role: UserRole;
+  dni?: string;
   phone?: string;
   birthDate?: Date;
   isActive: boolean;
@@ -46,9 +47,20 @@ const UserSchema: Schema = new Schema(
       default: UserRole.SOCIO,
       required: true
     },
-    // Telefono del usuario
+    // DNI del usuario, debe ser unico
+    dni: {
+      type: String,
+      unique: true,
+      sparse: true, // Permite valores null/undefined pero mantiene unicidad para valores existentes
+      trim: true,
+      uppercase: true,
+      match: [/^[0-9]{8}[A-Z]$/, 'Por favor ingresa un DNI válido (8 dígitos y 1 letra)']
+    },
+    // Telefono del usuario, debe ser unico
     phone: {
       type: String,
+      unique: true,
+      sparse: true, 
       trim: true,
       match: [/^[0-9]{9,15}$/, 'Por favor ingresa un teléfono válido']
     },

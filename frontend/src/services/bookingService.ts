@@ -58,6 +58,16 @@ class BookingService {
     const response = await api.get<ApiResponse<Booking[]>>(url);
     return response.data.data || [];
   }
+
+  //Obtener todas las reservas (Admin)
+  async getAllBookings(status?: string): Promise<Booking[]> {
+    const url = status
+      ? `${CLASS_SERVICE_URL}/api/bookings?status=${status}`
+      : `${CLASS_SERVICE_URL}/api/bookings`;
+
+    const response = await api.get<ApiResponse<Booking[]>>(url);
+    return response.data.data || [];
+  }
 }
 
 export default new BookingService();

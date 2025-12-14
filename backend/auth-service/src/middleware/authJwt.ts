@@ -65,39 +65,4 @@ export const isAdmin = (
   next();
 };
 
-/**
- * Middleware para verificar si el usuario es Monitor o Admin
- */
-export const isMonitorOrAdmin = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): void => {
-  if (req.userRole !== UserRole.MONITOR && req.userRole !== UserRole.ADMIN) {
-    res.status(403).json({ 
-      success: false,
-      message: 'Requiere permisos de monitor o administrador' 
-    });
-    return;
-  }
-  next();
-};
-
-/**
- * Middleware para verificar si el usuario es Socio (cualquier usuario autenticado)
- */
-export const isSocio = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): void => {
-  if (!req.userId) {
-    res.status(401).json({ 
-      success: false,
-      message: 'Usuario no autenticado' 
-    });
-    return;
-  }
-  next();
-};
 

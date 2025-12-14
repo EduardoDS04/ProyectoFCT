@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { DayOfWeek } from '../types';
 
 // Interfaz para ejercicios personalizados en la rutina del usuario
 export interface IUserRoutineExercise {
@@ -25,8 +26,7 @@ const UserRoutineSchema = new Schema<IUserRoutineDocument>(
     userId: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'User',
-      index: true
+      ref: 'User'
     },
     routineName: {
       type: String,
@@ -43,7 +43,7 @@ const UserRoutineSchema = new Schema<IUserRoutineDocument>(
       dayOfWeek: {
         type: String,
         required: true,
-        enum: ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'],
+        enum: Object.values(DayOfWeek),
         lowercase: true
       },
       sets: {

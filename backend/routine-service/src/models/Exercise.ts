@@ -3,15 +3,15 @@ import { MuscleGroup, Difficulty } from '../types';
 
 // Interfaz que define la estructura de un ejercicio
 export interface IExerciseDocument extends Document {
-  title: string;
-  description: string;
-  youtubeVideoId: string;
-  muscleGroup: MuscleGroup[];
-  difficulty: Difficulty;
-  thumbnailUrl?: string;
-  createdBy: mongoose.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
+  title: string; // nombre del ejercicio
+  description: string; // descripcion detallada del ejercicio
+  youtubeVideoId: string; // ID del video de YouTube
+  muscleGroup: MuscleGroup[]; // Array de grupos musculares 
+  difficulty: Difficulty; // Nivel de dificultad del ejercicio 
+  thumbnailUrl?: string; // URL opcional de la miniatura del video (se genera automáticamente si no se proporciona)
+  createdBy: mongoose.Types.ObjectId; // ID del usuario administrador que creó el ejercicio
+  createdAt: Date; 
+  updatedAt: Date; 
 }
 
 // Esquema de Mongoose para ejercicios
@@ -67,8 +67,7 @@ const ExerciseSchema = new Schema<IExerciseDocument>(
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'User',
-      index: true
+      ref: 'User'
     }
   },
   {

@@ -86,6 +86,7 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  dni?: string;
   phone?: string;
   birthDate?: string;
   isActive: boolean;
@@ -129,6 +130,7 @@ export interface RegisterData {
   email: string;
   password: string;
   name: string;
+  dni?: string;
   role?: UserRole;
   phone?: string;
   birthDate?: string;

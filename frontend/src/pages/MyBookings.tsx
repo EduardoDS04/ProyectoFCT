@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import bookingService from '../services/bookingService';
 import { getErrorMessage, isNetworkError } from '../utils/errorHandler';
@@ -14,19 +14,88 @@ const MyBookings = () => {
   const [filter, setFilter] = useState<BookingStatus | 'all'>('all');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    loadBookings();
-  }, [filter]);
+  const getClassSchedule = (booking: Booking): Date | null => {
+    if (typeof booking.classId === 'object' && booking.classId !== null && 'schedule' in booking.classId) {
+      return new Date((booking.classId as { schedule: string }).schedule);
+    }
+    return null;
+  };
 
-  const loadBookings = async () => {
+  const loadBookings = useCallback(async () => {
     try {
       setLoading(true);
       setError(''); // Limpiar error previo
-      const status = filter !== 'all' ? filter : undefined;
-      const data = await bookingService.getMyBookings(status);
       
-      // Ordenar por fecha de reserva (más reciente primero)
-      const sortedBookings = data.sort((a, b) => 
+      // Obtener todas las reservas sin filtrar por estado
+      const data = await bookingService.getMyBookings();
+      
+      // Eliminar duplicados antes de filtrar: si hay múltiples reservas para la misma clase,
+      // mantener solo la más reciente (priorizando confirmadas sobre canceladas)
+      const bookingsByClass = new Map<string, Booking>();
+      
+      data.forEach(booking => {
+        // Obtener el ID de la clase de forma consistente
+        let classId: string;
+        if (typeof booking.classId === 'object' && booking.classId !== null) {
+          const classObj = booking.classId as { _id?: string };
+          classId = String(classObj._id || booking.classId);
+        } else {
+          classId = String(booking.classId);
+        }
+        
+        const existing = bookingsByClass.get(classId);
+        
+        if (!existing) {
+          bookingsByClass.set(classId, booking);
+        } else {
+          // Prioridad: CONFIRMED > CANCELLED > COMPLETED
+          // Si la nueva reserva es confirmada y la existente es cancelada o completada, reemplazar
+          if (booking.status === BookingStatus.CONFIRMED && 
+              (existing.status === BookingStatus.CANCELLED || existing.status === BookingStatus.COMPLETED)) {
+            bookingsByClass.set(classId, booking);
+          }
+          // Si la nueva es cancelada y la existente es confirmada, mantener la confirmada (no hacer nada)
+          else if (booking.status === BookingStatus.CANCELLED && existing.status === BookingStatus.CONFIRMED) {
+            // No hacer nada, mantener la confirmada
+          }
+          // Si ambas son del mismo estado, mantener la más reciente
+          else if (booking.status === existing.status) {
+            const bookingDate = new Date(booking.bookingDate).getTime();
+            const existingDate = new Date(existing.bookingDate).getTime();
+            if (bookingDate > existingDate) {
+              bookingsByClass.set(classId, booking);
+            }
+          }
+          // Si la nueva es completada y la existente es confirmada, mantener la confirmada
+          else if (booking.status === BookingStatus.COMPLETED && existing.status === BookingStatus.CONFIRMED) {
+            // No hacer nada, mantener la confirmada
+          }
+        }
+      });
+      
+      // convertir el map a array
+      let uniqueBookings = Array.from(bookingsByClass.values());
+      
+      // Si el filtro no es "all", filtrar por estado despues de deduplicar
+      if (filter !== 'all') {
+        if (filter === BookingStatus.COMPLETED) {
+          // para completadas, filtrar solo las de la ultima semana
+          const oneWeekAgo = new Date();
+          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+          
+          uniqueBookings = uniqueBookings.filter(booking => {
+            if (booking.status !== BookingStatus.COMPLETED) return false;
+            const classSchedule = getClassSchedule(booking);
+            if (!classSchedule) return false;
+            return classSchedule >= oneWeekAgo && classSchedule <= new Date();
+          });
+        } else {
+          uniqueBookings = uniqueBookings.filter(booking => booking.status === filter);
+        }
+      }
+      
+      // ordenar por fecha de reserva (más reciente primero)
+      const sortedBookings = uniqueBookings.sort((a, b) => 
         new Date(b.bookingDate).getTime() - new Date(a.bookingDate).getTime()
       );
       
@@ -43,17 +112,18 @@ const MyBookings = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
 
-  const handleCancelBooking = async (id: string, className: string) => {
-    if (window.confirm(`¿Seguro que quieres cancelar tu reserva para "${className}"?`)) {
-      try {
-        await bookingService.cancelBooking(id);
-        alert('Reserva cancelada exitosamente');
-        loadBookings();
-      } catch (err) {
-        alert(getErrorMessage(err, 'Error al cancelar la reserva'));
-      }
+  useEffect(() => {
+    loadBookings();
+  }, [loadBookings]);
+
+  const handleCancelBooking = async (id: string) => {
+    try {
+      await bookingService.cancelBooking(id);
+      loadBookings();
+    } catch (err) {
+      alert(getErrorMessage(err, 'Error al cancelar la reserva'));
     }
   };
 
@@ -67,13 +137,6 @@ const MyBookings = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
-
-  const getClassSchedule = (booking: Booking): Date | null => {
-    if (typeof booking.classId === 'object' && booking.classId.schedule) {
-      return new Date(booking.classId.schedule);
-    }
-    return null;
   };
 
   const getStatusLabel = (status: BookingStatus | 'all'): string => {
@@ -113,9 +176,6 @@ const MyBookings = () => {
           <h1>Mis Reservas</h1>
           <img src="/reserva.png" alt="Reservas" className="my-bookings-image" />
         </div>
-        <button onClick={() => navigate('/classes')} className="btn-primary">
-          Ver Clases Disponibles
-        </button>
       </div>
 
       <div className="bookings-filters">
@@ -149,7 +209,13 @@ const MyBookings = () => {
 
       {bookings.length === 0 ? (
         <div className="no-bookings">
-          <p>No tienes reservas {filter !== 'all' && getStatusLabel(filter) ? `(${getStatusLabel(filter)})` : ''}</p>
+          <p>
+            {filter === BookingStatus.COMPLETED 
+              ? 'No tienes reservas completadas en la última semana' 
+              : filter !== 'all' && getStatusLabel(filter) 
+                ? `No tienes reservas ${getStatusLabel(filter)}` 
+                : 'No tienes reservas'}
+          </p>
           <button onClick={() => navigate('/classes')} className="btn-primary">
             Explorar Clases
           </button>
@@ -208,7 +274,7 @@ const MyBookings = () => {
                 {canCancel(booking) && (
                   <div className="booking-actions">
                     <button
-                      onClick={() => handleCancelBooking(booking._id, booking.className)}
+                      onClick={() => handleCancelBooking(booking._id)}
                       className="btn-cancel"
                     >
                       Cancelar Reserva

@@ -8,8 +8,8 @@ export interface ISubscriptionDocument extends Document {
   startDate: Date; // Fecha de inicio de la suscripcion
   endDate: Date; // Fecha de finalizacion de la suscripcion
   status: SubscriptionStatus; // Estado de la suscripcion (activa, expirada, cancelada, pendiente)
-  paymentStatus: PaymentStatus; // Estado del pago (pendiente, completado, fallido, reembolsado)
-  amount: number; // Monto pagado por la suscripcion
+  paymentStatus: PaymentStatus; // Estado del pago
+  amount: number; // precio pagado por la suscripcion
   bankDetails: {
     cardNumber: string; // Ultimos 4 digitos de la tarjeta de credito
     cardHolder: string; // Nombre del titular de la tarjeta
@@ -26,8 +26,7 @@ const SubscriptionSchema = new Schema<ISubscriptionDocument>(
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
-      index: true // Indice para busquedas rapidas por usuario
+      required: true
     },
     // Tipo de suscripcion seleccionada por el usuario
     subscriptionType: {
@@ -58,7 +57,7 @@ const SubscriptionSchema = new Schema<ISubscriptionDocument>(
       enum: Object.values(PaymentStatus),
       default: PaymentStatus.PENDING // Por defecto el pago esta pendiente
     },
-    // Monto total pagado por la suscripcion
+    // Precio total pagado por la suscripcion
     amount: {
       type: Number,
       required: true
@@ -121,9 +120,9 @@ export const getSubscriptionPrice = (type: SubscriptionType): number => {
     case SubscriptionType.MONTHLY:
       return 29.99; // Precio mensual
     case SubscriptionType.QUARTERLY:
-      return 79.99;  // Precio trimestral (ahorro de ~10 euros vs mensual)
+      return 79.99;  //ahorro de ~10 euros vs mensual
     case SubscriptionType.YEARLY:
-      return 299.99; // Precio anual (ahorro de ~60 euros vs mensual)
+      return 299.99; //(ahorro de ~60 euros vs mensual
     default:
       return 0;
   }

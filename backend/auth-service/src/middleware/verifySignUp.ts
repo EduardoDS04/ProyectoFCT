@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import User from '../models/User';
-import { UserRole } from '../types';
 
 /**
  * Middleware para validar datos de registro
@@ -31,27 +30,6 @@ export const checkDuplicateEmail = async (
       message: 'Error de conexión con la base de datos. Verifica que MongoDB esté corriendo.' 
     });
   }
-};
-
-/**
- * Middleware para validar el rol
- */
-export const checkRoleExists = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
-  const { role } = req.body;
-
-  if (role && !Object.values(UserRole).includes(role)) {
-    res.status(400).json({ 
-      success: false,
-      message: `Rol inválido. Roles permitidos: ${Object.values(UserRole).join(', ')}` 
-    });
-    return;
-  }
-
-  next();
 };
 
 /**

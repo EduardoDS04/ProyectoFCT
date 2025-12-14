@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { DayOfWeek } from '../types';
 
 // Interfaz para ejercicios dentro de una rutina predefinida
 export interface IRoutineExercise {
@@ -43,7 +44,7 @@ const RoutineSchema = new Schema<IRoutineDocument>(
       dayOfWeek: {
         type: String,
         required: true,
-        enum: ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'],
+        enum: Object.values(DayOfWeek),
         lowercase: true
       },
       sets: {
@@ -64,8 +65,7 @@ const RoutineSchema = new Schema<IRoutineDocument>(
     createdBy: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'User',
-      index: true
+      ref: 'User'
     }
   },
   {

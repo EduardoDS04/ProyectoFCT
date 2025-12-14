@@ -72,10 +72,3 @@ export interface CreateSubscriptionDTO {
   subscriptionType: SubscriptionType;
   bankDetails: BankDetails;
 }
-
-// DTO para actualizar suscripcion
-export interface UpdateSubscriptionDTO {
-  subscriptionType?: SubscriptionType;
-  bankDetails?: BankDetails;
-}
-

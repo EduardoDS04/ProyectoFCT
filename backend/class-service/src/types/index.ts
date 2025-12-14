@@ -19,36 +19,6 @@ export enum BookingStatus {
   COMPLETED = 'completed'
 }
 
-// Interfaces de Clase
-export interface IClass {
-  _id?: string;
-  name: string;
-  description: string;
-  monitorId: string;
-  monitorName?: string;
-  schedule: Date;
-  duration: number; // en minutos
-  maxParticipants: number;
-  currentParticipants: number;
-  room: string;
-  status: ClassStatus;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-// Interfaces de Reserva
-export interface IBooking {
-  _id?: string;
-  userId: string;
-  userName?: string;
-  classId: string;
-  className?: string;
-  bookingDate: Date;
-  status: BookingStatus;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
 // Request con usuario autenticado (desde Auth Service)
 export interface AuthRequest extends Request {
   userId?: string;
@@ -60,7 +30,7 @@ export interface AuthRequest extends Request {
 // DTOs para requests
 export interface CreateClassDTO {
   name: string;
-  description: string;
+  description?: string;
   schedule: string | Date;
   duration: number;
   maxParticipants: number;
@@ -93,4 +63,3 @@ export interface AuthServiceUserResponse {
     isActive: boolean;
   };
 }
-

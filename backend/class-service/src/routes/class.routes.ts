@@ -20,14 +20,14 @@ const router = Router();
  * Rutas públicas (requieren autenticación)
  */
 
-// GET /api/classes - Listar todas las clases
-router.get('/', verifyToken, getAllClasses);
-
-// GET /api/classes/my-classes - Mis clases (como monitor)
+// GET /api/classes/my-classes - Mis clases (como monitor) 
 router.get('/my-classes', verifyToken, isMonitorOrAdmin, getMyClasses);
 
-// GET /api/classes/:id - Obtener una clase
+// GET /api/classes/:id - Obtener una clase 
 router.get('/:id', verifyToken, getClassById);
+
+// GET /api/classes - Listar todas las clases 
+router.get('/', verifyToken, getAllClasses);
 
 /**
  * Rutas protegidas (Monitor o Admin)

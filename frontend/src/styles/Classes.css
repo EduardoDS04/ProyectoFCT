@@ -194,19 +194,52 @@
   cursor: not-allowed;
 }
 
-.btn-secondary {
+.class-actions .btn-secondary {
   padding: 0.8rem 1.2rem;
-  background: #6c757d;
-  color: white;
+  background: #2196F3 !important;
+  color: white !important;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, background 0.2s;
 }
 
-.btn-secondary:hover {
+.class-actions .btn-secondary:hover {
   transform: scale(1.05);
+  background: #1976D2 !important;
+}
+
+.class-actions .btn-cancel {
+  padding: 0.8rem 1.2rem;
+  background: #f44336 !important;
+  color: white !important;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.class-actions .btn-cancel:hover {
+  transform: scale(1.05);
+  background: #d32f2f !important;
+}
+
+.class-actions .btn-view {
+  padding: 0.8rem 1.2rem;
+  background: #4CAF50 !important;
+  color: white !important;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.class-actions .btn-view:hover {
+  transform: scale(1.05);
+  background: #45a049 !important;
 }
 
 .booking-disabled {

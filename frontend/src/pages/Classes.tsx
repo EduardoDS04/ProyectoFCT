@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import classService from '../services/classService';
 import bookingService from '../services/bookingService';
+import paymentService from '../services/paymentService';
 import { getErrorMessage, isNetworkError } from '../utils/errorHandler';
 import type { Class } from '../types';
 import { ClassStatus } from '../types';
@@ -16,6 +17,7 @@ const Classes = () => {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<ClassStatus | 'all' | 'today'>('all');
   const [bookingClass, setBookingClass] = useState<string | null>(null);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -23,7 +25,21 @@ const Classes = () => {
   useEffect(() => {
     loadClasses();
     loadMyBookings();
-  }, [filter]);
+    if (user?.role === 'socio') {
+      checkSubscription();
+    }
+  }, [filter, user?.role]);
+
+  // Verificar suscripción activa
+  const checkSubscription = async () => {
+    try {
+      const hasActive = await paymentService.checkActiveSubscription();
+      setHasActiveSubscription(hasActive);
+    } catch (error) {
+      console.warn('Error al verificar suscripción:', error);
+      setHasActiveSubscription(false);
+    }
+  };
 
   // Cargar clases segun el filtro seleccionado
   const loadClasses = async () => {
@@ -46,55 +62,47 @@ const Classes = () => {
         });
       } else if (filter === 'all') {
         if (user?.role === 'socio') {
-          // Para socios: todas las canceladas, solo sus reservas completadas y clases del día actual
+          // Para socios: todas las clases activas, canceladas de la última semana, y solo sus reservas completadas de la última semana
           const allBookings = await bookingService.getMyBookings();
           const completedBookingClassIds = allBookings
             .filter(b => b.status === 'completed')
             .map(b => typeof b.classId === 'object' ? b.classId._id : b.classId);
           
-          // Obtener clases del dia actual (incluye futuras del dia)
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const tomorrow = new Date(today);
-          tomorrow.setDate(tomorrow.getDate() + 1);
+          // Obtener todas las clases activas (confirmadas/futuras)
+          const activeClasses = await classService.getAllClasses({ status: 'active' });
           
-          const todayClasses = await classService.getAllClasses({
-            fromDate: today.toISOString(),
-            toDate: tomorrow.toISOString()
+          // Obtener clases canceladas y filtrar solo las de la última semana
+          const allCancelledClasses = await classService.getAllClasses({ status: 'cancelled' });
+          const oneWeekAgo = new Date();
+          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+          const cancelledClasses = allCancelledClasses.filter(c => {
+            const classDate = new Date(c.schedule);
+            return classDate >= oneWeekAgo;
           });
           
-          // Obtener todas las clases canceladas 
-          const cancelledClasses = await classService.getAllClasses({ status: 'cancelled' });
-          
-          // Obtener clases completadas y filtrar solo las que el socio ha reservado
-          const completedClasses = await classService.getAllClasses({ status: 'completed' });
-          const myCompletedClasses = completedClasses.filter(c => completedBookingClassIds.includes(c._id));
+          // Obtener clases completadas y filtrar solo las que el socio ha reservado y de la última semana
+          const allCompletedClasses = await classService.getAllClasses({ status: 'completed' });
+          const myCompletedClasses = allCompletedClasses.filter(c => {
+            const classDate = new Date(c.schedule);
+            return completedBookingClassIds.includes(c._id) && classDate >= oneWeekAgo;
+          });
           
           // Combinar y eliminar duplicados
           const allClassesMap = new Map<string, Class>();
-          [...todayClasses, ...cancelledClasses, ...myCompletedClasses].forEach(c => {
+          [...activeClasses, ...cancelledClasses, ...myCompletedClasses].forEach(c => {
             allClassesMap.set(c._id, c);
           });
           
           data = Array.from(allClassesMap.values());
         } else {
-          // Para admin/monitor: canceladas, completadas y del día actual
+          // Para admin/monitor: todas las clases (canceladas, completadas, activas)
           const cancelledClasses = await classService.getAllClasses({ status: 'cancelled' });
           const completedClasses = await classService.getAllClasses({ status: 'completed' });
-          
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const tomorrow = new Date(today);
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          
-          const todayClasses = await classService.getAllClasses({
-            fromDate: today.toISOString(),
-            toDate: tomorrow.toISOString()
-          });
+          const activeClasses = await classService.getAllClasses({ status: 'active' });
           
           // Combinar y eliminar duplicados
           const allClassesMap = new Map<string, Class>();
-          [...todayClasses, ...cancelledClasses, ...completedClasses].forEach(c => {
+          [...activeClasses, ...cancelledClasses, ...completedClasses].forEach(c => {
             allClassesMap.set(c._id, c);
           });
           
@@ -104,17 +112,31 @@ const Classes = () => {
         // Filtro por estado específico
         if (user?.role === 'socio') {
           if (filter === ClassStatus.CANCELLED) {
-            // Para socios: mostrar TODAS las clases canceladas (aunque no las hayan reservado)
-            data = await classService.getAllClasses({ status: filter });
+            // Para socios: mostrar clases canceladas de la última semana
+            const allCancelledClasses = await classService.getAllClasses({ status: filter });
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            data = allCancelledClasses.filter(c => {
+              const classDate = new Date(c.schedule);
+              return classDate >= oneWeekAgo;
+            });
           } else if (filter === ClassStatus.COMPLETED) {
-            // Para socios: solo mostrar clases completadas que hayan reservado
+            // Para socios: solo mostrar clases completadas que hayan reservado y de la última semana
             const allBookings = await bookingService.getMyBookings();
             const completedBookingClassIds = allBookings
               .filter(b => b.status === 'completed')
               .map(b => typeof b.classId === 'object' ? b.classId._id : b.classId);
             
             const allCompletedClasses = await classService.getAllClasses({ status: filter });
-            data = allCompletedClasses.filter(c => completedBookingClassIds.includes(c._id));
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            data = allCompletedClasses.filter(c => {
+              const classDate = new Date(c.schedule);
+              return completedBookingClassIds.includes(c._id) && classDate >= oneWeekAgo;
+            });
+          } else if (filter === ClassStatus.ACTIVE) {
+            // Para socios: mostrar solo clases activas (confirmadas/vigentes)
+            data = await classService.getAllClasses({ status: filter });
           } else {
             // Otros estados: mostrar todas
             data = await classService.getAllClasses({ status: filter });
@@ -189,6 +211,19 @@ const Classes = () => {
     }
   };
 
+  // Manejar la cancelación de una clase
+  const handleCancelClass = async (id: string, name: string) => {
+    if (window.confirm(`¿Seguro que quieres cancelar la clase "${name}"?\n\nSe cancelarán todas las reservas asociadas.`)) {
+      try {
+        await classService.cancelClass(id);
+        alert('Clase cancelada exitosamente');
+        loadClasses();
+      } catch (err) {
+        alert(getErrorMessage(err, 'Error al cancelar la clase'));
+      }
+    }
+  };
+
   // Formatear fecha para mostrar en la interfaz
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -216,6 +251,10 @@ const Classes = () => {
   const canBook = (classItem: Class) => {
     // Solo los socios pueden reservar clases
     if (user?.role !== 'socio') {
+      return false;
+    }
+    // debe tener suscripción activa
+    if (!hasActiveSubscription) {
       return false;
     }
     return classItem.status !== 'cancelled' && 
@@ -248,6 +287,7 @@ const Classes = () => {
           <img src="/clases.png" alt="Clases" className="classes-image" />
         </div>
         
+        {/* boton de crear clase solo visible para administradores y monitores */}
         {(user?.role === 'monitor' || user?.role === 'admin') && (
           <button 
             onClick={() => navigate('/classes/create')}
@@ -258,12 +298,19 @@ const Classes = () => {
         )}
       </div>
 
+      {/* Botones de filtrado para mostrar clases por estado o todas las clases */}
       <div className="classes-filters">
         <button 
           className={filter === 'all' ? 'filter-btn active' : 'filter-btn'}
           onClick={() => setFilter('all')}
         >
           Todas
+        </button>
+        <button 
+          className={filter === ClassStatus.ACTIVE ? 'filter-btn active' : 'filter-btn'}
+          onClick={() => setFilter(ClassStatus.ACTIVE)}
+        >
+          Confirmadas
         </button>
         <button 
           className={filter === 'today' ? 'filter-btn active' : 'filter-btn'}
@@ -287,6 +334,21 @@ const Classes = () => {
 
       {error && <div className="error-message">{error}</div>}
 
+      {/* Mostrar advertencia a socios sin suscripcion activa para informarles que necesitan suscripción */}
+      {user?.role === 'socio' && !hasActiveSubscription && (
+        <div className="warning-message" style={{ 
+          background: '#fff3cd', 
+          color: '#856404', 
+          padding: '1rem', 
+          borderRadius: '8px', 
+          marginBottom: '1rem',
+          borderLeft: '4px solid rgb(143, 114, 26)'
+        }}>
+          <strong>Suscripción requerida:</strong> Necesitas una suscripción activa para reservar clases.
+        </div>
+      )}
+
+      {/* Mostrar mensaje cuando no hay clases disponibles, con opción de crear para admin/monitor */}
       {classes.length === 0 ? (
         <div className="no-classes">
           <p>No hay clases disponibles</p>
@@ -298,19 +360,23 @@ const Classes = () => {
         </div>
       ) : (
         <div className="classes-grid">
+          {/* Grid de tarjetas de clases con información detallada de cada una */}
           {classes.map((classItem) => (
             <div key={classItem._id} className={`class-card ${classItem.status}`}>
               <div className="class-card-header">
+                {/* Limpiar etiquetas de estado del nombre de la clase para mostrar solo el nombre */}
                 <h3>{classItem.name.replace(/\s*\[CANCELADA\]/gi, '').replace(/\s*\[COMPLETADA\]/gi, '')}</h3>
-                {(classItem.status === 'cancelled' || classItem.status === 'completed') && (
+                {/* Mostrar badge de estado solo para clases completadas */}
+                {classItem.status === 'completed' && (
                   <span className={`class-status ${classItem.status}`}>
-                    {classItem.status === 'cancelled' ? 'Cancelada' : 'Completada'}
+                    Completada
                   </span>
                 )}
               </div>
 
               <p className="class-description">{classItem.description}</p>
 
+              {/* Detalles de la clase: monitor, fecha, duración, sala y cupos disponibles */}
               <div className="class-details">
                 <div className="detail-item">
                   <span>Monitor: {classItem.monitorName}</span>
@@ -332,37 +398,69 @@ const Classes = () => {
                 </div>
               </div>
 
+              {/* Acciones disponibles según el rol del usuario: reservar para socios, editar/cancelar para admin/monitor */}
               <div className="class-actions">
-                {hasBooking(classItem._id) ? (
-                  <div className="booking-reserved">
-                    Reservado
-                  </div>
-                ) : canBook(classItem) ? (
-                  <button
-                    onClick={() => handleBookClass(classItem._id)}
-                    disabled={bookingClass === classItem._id}
-                    className="btn-book"
-                  >
-                    {bookingClass === classItem._id ? 'Reservando...' : 'Reservar'}
-                  </button>
+                {user?.role === 'socio' ? (
+                  <>
+                    {/* Mostrar estado de reserva: ya reservada, disponible para reservar, o no disponible con motivo */}
+                    {hasBooking(classItem._id) ? (
+                      <div className="booking-reserved">
+                        Reservado
+                      </div>
+                    ) : canBook(classItem) ? (
+                      // Botón para reservar clase, deshabilitado mientras se procesa la reserva
+                      <button
+                        onClick={() => handleBookClass(classItem._id)}
+                        disabled={bookingClass === classItem._id}
+                        className="btn-book"
+                      >
+                        {bookingClass === classItem._id ? 'Reservando...' : 'Reservar'}
+                      </button>
+                    ) : (
+                      // mostrar motivo por el cual no se puede reservar
+                      <div className="booking-disabled">
+                        {!hasActiveSubscription && 'Necesitas suscripción activa'}
+                        {hasActiveSubscription && isClassFull(classItem) && 'Clase completa'}
+                        {hasActiveSubscription && classItem.status === 'completed' && 'Completada'}
+                        {hasActiveSubscription && classItem.status === 'cancelled' && 'Clase cancelada'}
+                        {hasActiveSubscription && isClassPast(classItem) && classItem.status !== 'completed' && classItem.status !== 'cancelled' && !isClassFull(classItem) && 'Clase finalizada'}
+                      </div>
+                    )}
+                  </>
                 ) : (
-                  <div className="booking-disabled">
-                    {isClassFull(classItem) && 'Clase completa'}
-                    {classItem.status === 'completed' && 'Completada'}
-                    {classItem.status === 'cancelled' && 'Clase cancelada'}
-                    {isClassPast(classItem) && classItem.status !== 'completed' && classItem.status !== 'cancelled' && !isClassFull(classItem) && 'Clase finalizada'}
-                  </div>
+                  <>
+                    {/* Botones para admin y monitor */}
+                    {((user?.role === 'monitor' && classItem.monitorId === user.id) ||
+                      user?.role === 'admin') && (
+                      <>
+                        {canEdit(classItem) && (
+                          <button
+                            onClick={() => navigate(`/classes/edit/${classItem._id}`)}
+                            className="btn-secondary"
+                          >
+                            Editar
+                          </button>
+                        )}
+                        {classItem.status !== 'cancelled' && 
+                         classItem.status !== 'completed' && 
+                         !isClassPast(classItem) && (
+                          <button
+                            onClick={() => handleCancelClass(classItem._id, classItem.name)}
+                            className="btn-cancel"
+                          >
+                            Cancelar
+                          </button>
+                        )}
+                        <button
+                          onClick={() => navigate(`/bookings/class/${classItem._id}`)}
+                          className="btn-view"
+                        >
+                          Ver Reservas
+                        </button>
+                      </>
+                    )}
+                  </>
                 )}
-
-                {((user?.role === 'monitor' && classItem.monitorId === user.id) ||
-                 user?.role === 'admin') && canEdit(classItem) ? (
-                  <button
-                    onClick={() => navigate(`/classes/edit/${classItem._id}`)}
-                    className="btn-secondary"
-                  >
-                    Editar
-                  </button>
-                ) : null}
               </div>
             </div>
           ))}

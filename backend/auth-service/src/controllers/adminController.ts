@@ -1,7 +1,9 @@
 import { Response } from 'express';
-import bcrypt from 'bcryptjs';
+import axios from 'axios';
 import User from '../models/User';
 import { AuthRequest, UserRole } from '../types';
+
+const CLASS_SERVICE_URL = process.env.CLASS_SERVICE_URL || 'http://localhost:3002';
 
 /**
  * Obtener todos los usuarios
@@ -11,10 +13,17 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
   try {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
 
+    // Mapear usuarios para incluir id además de _id
+    const mappedUsers = users.map(user => ({
+      ...user.toObject(),
+      id: String(user._id),
+      _id: String(user._id)
+    }));
+
     res.status(200).json({
       success: true,
-      data: users,
-      count: users.length
+      data: mappedUsers,
+      count: mappedUsers.length
     });
   } catch (error) {
     console.error('Error al obtener usuarios:', error);
@@ -34,6 +43,15 @@ export const updateUserRole = async (req: AuthRequest, res: Response): Promise<v
     const { id } = req.params;
     const { role } = req.body;
 
+    // Validar que el ID existe
+    if (!id || id === 'undefined') {
+      res.status(400).json({
+        success: false,
+        message: 'ID de usuario inválido'
+      });
+      return;
+    }
+
     // Validar que el rol sea válido
     if (!Object.values(UserRole).includes(role)) {
       res.status(400).json({
@@ -51,6 +69,42 @@ export const updateUserRole = async (req: AuthRequest, res: Response): Promise<v
         message: 'Usuario no encontrado'
       });
       return;
+    }
+
+    // no permitir que un admin cambie su propio rol
+    if (String(user._id) === req.userId) {
+      res.status(400).json({
+        success: false,
+        message: 'No puedes cambiar tu propio rol'
+      });
+      return;
+    }
+
+    // verificar si el usuario tiene reservas antes de cambiar el rol
+    try {
+      const token = req.headers.authorization?.split(' ')[1];
+      const bookingsResponse = await axios.get(
+        `${CLASS_SERVICE_URL}/api/bookings?userId=${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (bookingsResponse.data.success && bookingsResponse.data.data) {
+        const bookings = bookingsResponse.data.data;
+        if (bookings.length > 0) {
+          res.status(400).json({
+            success: false,
+            message: 'No se puede cambiar el rol de un usuario que tiene reservas de clases. Por favor, cancela o completa todas sus reservas primero.'
+          });
+          return;
+        }
+      }
+    } catch (error: any) {
+      // Si el servicio de clases no está disponible o hay un error, permitir el cambio
+      // Continuar con el cambio de rol
     }
 
     // Actualizar rol
@@ -103,6 +157,15 @@ export const toggleUserActive = async (req: AuthRequest, res: Response): Promise
       return;
     }
 
+    // No permitir desactivar administradores (solo monitores y socios)
+    if (user.role === UserRole.ADMIN) {
+      res.status(400).json({
+        success: false,
+        message: 'No se pueden desactivar administradores'
+      });
+      return;
+    }
+
     // Toggle estado
     user.isActive = !user.isActive;
     await user.save();
@@ -122,69 +185,6 @@ export const toggleUserActive = async (req: AuthRequest, res: Response): Promise
     res.status(500).json({
       success: false,
       message: 'Error al cambiar estado del usuario'
-    });
-  }
-};
-
-/**
- * Crear usuario admin directamente
- * POST /api/admin/users/create-admin
- */
-export const createAdmin = async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const { email, password, name, phone } = req.body;
-
-    // Validar campos requeridos
-    if (!email || !password || !name) {
-      res.status(400).json({
-        success: false,
-        message: 'Email, contraseña y nombre son obligatorios'
-      });
-      return;
-    }
-
-    // Verificar si el email ya existe
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-
-    if (existingUser) {
-      res.status(400).json({
-        success: false,
-        message: 'El email ya está registrado'
-      });
-      return;
-    }
-
-    // Hash de la contraseña
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Crear nuevo admin
-    const newAdmin = new User({
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      name,
-      role: UserRole.ADMIN,
-      phone,
-      isActive: true
-    });
-
-    await newAdmin.save();
-
-    res.status(201).json({
-      success: true,
-      message: 'Administrador creado exitosamente',
-      data: {
-        id: String(newAdmin._id),
-        email: newAdmin.email,
-        name: newAdmin.name,
-        role: newAdmin.role
-      }
-    });
-  } catch (error) {
-    console.error('Error al crear admin:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al crear administrador'
     });
   }
 };
@@ -231,39 +231,4 @@ export const deleteUser = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-/**
- * Obtener estadísticas de usuarios
- * GET /api/admin/stats
- */
-export const getUserStats = async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const totalUsers = await User.countDocuments();
-    const activeUsers = await User.countDocuments({ isActive: true });
-    const inactiveUsers = await User.countDocuments({ isActive: false });
-    
-    const socios = await User.countDocuments({ role: UserRole.SOCIO });
-    const monitores = await User.countDocuments({ role: UserRole.MONITOR });
-    const admins = await User.countDocuments({ role: UserRole.ADMIN });
-
-    res.status(200).json({
-      success: true,
-      data: {
-        total: totalUsers,
-        active: activeUsers,
-        inactive: inactiveUsers,
-        byRole: {
-          socios,
-          monitores,
-          admins
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error al obtener estadísticas:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener estadísticas'
-    });
-  }
-};
 

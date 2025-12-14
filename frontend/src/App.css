@@ -1,18 +1,23 @@
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  margin: 0;                    
+  padding: 0;                   
+  box-sizing: border-box;       
 }
 
+/* Estilos para el contenedor raíz de React (#root) */
 #root {
-  min-height: 100vh;
-  background: #1a1a1a;
+  min-height: 100vh;            
+  background: #1a1a1a;          /* Color de fondo oscuro (casi negro) para toda la aplicación */
 }
 
+/* Estilos globales para el elemento body de la página */
 body {
+  /* Fuente del sistema: usa la fuente nativa del sistema operativo para mejor rendimiento */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  /* Suavizado de fuentes en navegadores WebKit (Chrome, Safari, Edge) */
+  /* Mejora la legibilidad del texto renderizado */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #1a1a1a;

@@ -30,10 +30,12 @@ const Routines = () => {
     loadData();
   }, []);
 
+  // Cargar rutinas predefinidas, rutina personalizada del usuario y todos los ejercicios en paralelo
   const loadData = async () => {
     try {
       setLoading(true);
       setError('');
+      // Usar Promise.all para cargar datos en paralelo y catch en getMyRoutine por si el usuario no tiene rutina aún
       const [routinesData, myRoutineData, exercisesData] = await Promise.all([
         routineService.getAllRoutines(),
         routineService.getMyRoutine().catch(() => null),
@@ -54,9 +56,11 @@ const Routines = () => {
     setExpandedRoutines(prev => toggleSetItem(prev, routineId));
   };
 
+  // Abrir modal de ejercicio: si se pasa exerciseItem e index, es modo edición; si no, es modo creación
   const handleExerciseClick = (exercise: Exercise, exerciseItem?: UserRoutine['exercises'][0], index?: number) => {
     setSelectedExercise(exercise);
     setEditingExerciseIndex(exerciseItem && index !== undefined ? index : null);
+    // Prellenar formulario con datos del ejercicio si está editando, sino usar valores por defecto
     setExerciseForm(exerciseItem && index !== undefined ? {
       dayOfWeek: exerciseItem.dayOfWeek || 'lunes',
       sets: exerciseItem.sets,
@@ -113,11 +117,13 @@ const Routines = () => {
     }
   };
 
+  // Reordenar ejercicios en la rutina personalizada moviéndolos arriba o abajo
   const handleMoveExercise = async (fromIndex: number, direction: 'up' | 'down') => {
     if (!myRoutine) return;
     
     const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1;
     
+    // Validar que el índice destino esté dentro de los límites del array
     if (toIndex < 0 || toIndex >= myRoutine.exercises.length) {
       return; // No se puede mover fuera de los límites
     }
@@ -189,6 +195,7 @@ const Routines = () => {
         </div>
       )}
 
+      {/* Alternar entre vista de rutina personalizada y vista de ejercicios/rutinas predefinidas */}
       {showMyRoutine ? (
         // Vista de Mi Rutina Personalizada
         <div className="my-routine-section">
@@ -225,10 +232,11 @@ const Routines = () => {
               ) : (
                 <div className="my-routine-exercises-grid">
                   {filteredExercises.map((exerciseItem, index) => {
-                  // Necesitamos el índice original para las funciones de editar/eliminar/reordenar
+                  // Necesitamos el índice original del array completo para editar/eliminar/reordenar correctamente
                   const originalIndex = myRoutine.exercises.findIndex(
                     (ex) => ex === exerciseItem
                   );
+                // Obtener el ejercicio completo: puede venir populado (objeto) o necesitar búsqueda
                 const exercise = typeof exerciseItem.exerciseId === 'object' 
                   ? exerciseItem.exerciseId 
                   : null;
@@ -408,11 +416,12 @@ const Routines = () => {
                             <p className="no-exercises">Esta rutina no tiene ejercicios.</p>
                           ) : (
                             routine.exercises.map((routineExercise, index) => {
+                              // obtener ejercicio completo: puede venir populado desde la API o buscarlo en el array
                               const exercise = typeof routineExercise.exerciseId === 'object' 
                                 ? routineExercise.exerciseId 
                                 : exercises.find(ex => ex._id === routineExercise.exerciseId);
                               
-                              if (!exercise) return null;
+                              if (!exercise) return null; // Si no se encuentra, no renderizar
 
                               return (
                                 <div
@@ -516,6 +525,7 @@ const Routines = () => {
                   </div>
                 </div>
                 
+                {/* Formulario para añadir o editar ejercicio: cambia el título según el modo (edición o creación) */}
                 <div className="exercise-form">
                   <h3>{editingExerciseIndex !== null ? 'Editar ejercicio en tu rutina:' : 'Personaliza este ejercicio para tu rutina:'}</h3>
                   <div className="form-group">

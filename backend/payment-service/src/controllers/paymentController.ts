@@ -1,7 +1,52 @@
 import { Response } from 'express';
-import Subscription, { getSubscriptionPrice } from '../models/Subscription';
+import Subscription, { getSubscriptionPrice, calculateEndDate } from '../models/Subscription';
 import { AuthRequest, ApiResponse, CreateSubscriptionDTO, SubscriptionType, SubscriptionStatus, PaymentStatus } from '../types';
 import mongoose from 'mongoose';
+
+// helper para validar autenticación
+const checkAuth = (req: AuthRequest, res: Response<ApiResponse>): boolean => {
+  if (!req.userId) {
+    res.status(401).json({
+      success: false,
+      message: 'Usuario no autenticado'
+    });
+    return false;
+  }
+  return true;
+};
+
+// helper para validar ObjectId
+const validateObjectId = (id: string, res: Response<ApiResponse>): boolean => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    res.status(400).json({
+      success: false,
+      message: 'ID de suscripcion inválido'
+    });
+    return false;
+  }
+  return true;
+};
+
+// helper para formatear datos bancarios de una suscripción
+const formatSafeSubscription = (subscription: any) => ({
+  ...subscription,
+  bankDetails: {
+    ...subscription.bankDetails,
+    cardNumber: `**** **** **** ${subscription.bankDetails.cardNumber}`
+  }
+});
+
+// helper para verificar que la suscripción pertenece al usuario
+const checkSubscriptionOwnership = (subscription: any, userId: string, res: Response<ApiResponse>, action: string): boolean => {
+  if (subscription.userId.toString() !== userId) {
+    res.status(403).json({
+      success: false,
+      message: `No tienes permisos para ${action} esta suscripcion`
+    });
+    return false;
+  }
+  return true;
+};
 
 // Obtener todas las suscripciones del usuario autenticado
 export const getMySubscriptions = async (
@@ -9,26 +54,13 @@ export const getMySubscriptions = async (
   res: Response<ApiResponse>
 ): Promise<void> => {
   try {
-    if (!req.userId) {
-      res.status(401).json({
-        success: false,
-        message: 'Usuario no autenticado'
-      });
-      return;
-    }
+    if (!checkAuth(req, res)) return;
 
     const subscriptions = await Subscription.find({ userId: req.userId })
       .sort({ createdAt: -1 })
       .lean();
 
-    // Formatear datos bancarios para mostrar (ya solo tenemos los ultimos 4 digitos guardados)
-    const safeSubscriptions = subscriptions.map(sub => ({
-      ...sub,
-      bankDetails: {
-        ...sub.bankDetails,
-        cardNumber: `**** **** **** ${sub.bankDetails.cardNumber}`
-      }
-    }));
+    const safeSubscriptions = subscriptions.map(formatSafeSubscription);
 
     res.status(200).json({
       success: true,
@@ -49,23 +81,10 @@ export const getSubscriptionById = async (
   res: Response<ApiResponse>
 ): Promise<void> => {
   try {
-    if (!req.userId) {
-      res.status(401).json({
-        success: false,
-        message: 'Usuario no autenticado'
-      });
-      return;
-    }
+    if (!checkAuth(req, res)) return;
 
     const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.status(400).json({
-        success: false,
-        message: 'ID de suscripcion inválido'
-      });
-      return;
-    }
+    if (!validateObjectId(id, res)) return;
 
     const subscription = await Subscription.findById(id).lean();
 
@@ -77,23 +96,9 @@ export const getSubscriptionById = async (
       return;
     }
 
-    // Verificar que la suscripcion pertenece al usuario
-    if (subscription.userId.toString() !== req.userId) {
-      res.status(403).json({
-        success: false,
-        message: 'No tienes permisos para ver esta suscripcion'
-      });
-      return;
-    }
+    if (!checkSubscriptionOwnership(subscription, req.userId!, res, 'ver')) return;
 
-    // Formatear datos bancarios para mostrarlos
-    const safeSubscription = {
-      ...subscription,
-      bankDetails: {
-        ...subscription.bankDetails,
-        cardNumber: `**** **** **** ${subscription.bankDetails.cardNumber}`
-      }
-    };
+    const safeSubscription = formatSafeSubscription(subscription);
 
     res.status(200).json({
       success: true,
@@ -114,13 +119,7 @@ export const createSubscription = async (
   res: Response<ApiResponse>
 ): Promise<void> => {
   try {
-    if (!req.userId) {
-      res.status(401).json({
-        success: false,
-        message: 'Usuario no autenticado'
-      });
-      return;
-    }
+    if (!checkAuth(req, res)) return;
 
     const { subscriptionType, bankDetails }: CreateSubscriptionDTO = req.body;
 
@@ -186,20 +185,7 @@ export const createSubscription = async (
 
     // Calcular fechas y precio
     const startDate = new Date();
-    const endDate = new Date(startDate);
-    
-    switch (subscriptionType) {
-      case SubscriptionType.MONTHLY:
-        endDate.setMonth(endDate.getMonth() + 1);
-        break;
-      case SubscriptionType.QUARTERLY:
-        endDate.setMonth(endDate.getMonth() + 3);
-        break;
-      case SubscriptionType.YEARLY:
-        endDate.setFullYear(endDate.getFullYear() + 1);
-        break;
-    }
-
+    const endDate = calculateEndDate(startDate, subscriptionType);
     const amount = getSubscriptionPrice(subscriptionType);
 
     // Simular procesamiento de pago (en produccion esto se haria con una pasarela real)
@@ -208,8 +194,13 @@ export const createSubscription = async (
     const subscriptionStatus = SubscriptionStatus.ACTIVE;
 
     // Crear suscripcion (guardar solo ultimos 4 digitos de la tarjeta por seguridad)
+    // Asegurar que userId sea un ObjectId válido
+    const userIdObjectId = mongoose.Types.ObjectId.isValid(req.userId!) 
+      ? new mongoose.Types.ObjectId(req.userId!) 
+      : req.userId!;
+
     const subscription = new Subscription({
-      userId: req.userId,
+      userId: userIdObjectId,
       subscriptionType,
       startDate,
       endDate,
@@ -225,14 +216,7 @@ export const createSubscription = async (
 
     await subscription.save();
 
-    // Formatear datos bancarios para la respuesta 
-    const safeSubscription = {
-      ...subscription.toObject(),
-      bankDetails: {
-        ...subscription.bankDetails,
-        cardNumber: `**** **** **** ${subscription.bankDetails.cardNumber}`
-      }
-    };
+    const safeSubscription = formatSafeSubscription(subscription.toObject());
 
     res.status(201).json({
       success: true,
@@ -257,23 +241,10 @@ export const cancelSubscription = async (
   res: Response<ApiResponse>
 ): Promise<void> => {
   try {
-    if (!req.userId) {
-      res.status(401).json({
-        success: false,
-        message: 'Usuario no autenticado'
-      });
-      return;
-    }
+    if (!checkAuth(req, res)) return;
 
     const { id } = req.params;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.status(400).json({
-        success: false,
-        message: 'ID de suscripcion inválido'
-      });
-      return;
-    }
+    if (!validateObjectId(id, res)) return;
 
     const subscription = await Subscription.findById(id);
 
@@ -285,14 +256,7 @@ export const cancelSubscription = async (
       return;
     }
 
-    // Verificar que la suscripcion pertenece al usuario
-    if (subscription.userId.toString() !== req.userId) {
-      res.status(403).json({
-        success: false,
-        message: 'No tienes permisos para cancelar esta suscripcion'
-      });
-      return;
-    }
+    if (!checkSubscriptionOwnership(subscription, req.userId!, res, 'cancelar')) return;
 
     // Solo se pueden cancelar suscripciones activas
     if (subscription.status !== SubscriptionStatus.ACTIVE) {
@@ -335,14 +299,9 @@ export const checkActiveSubscription = async (
   res: Response<ApiResponse>
 ): Promise<void> => {
   try {
-    if (!req.userId) {
-      res.status(401).json({
-        success: false,
-        message: 'Usuario no autenticado'
-      });
-      return;
-    }
+    if (!checkAuth(req, res)) return;
 
+    // Buscar suscripción activa
     const activeSubscription = await Subscription.findOne({
       userId: req.userId,
       status: SubscriptionStatus.ACTIVE
@@ -373,14 +332,7 @@ export const getAllSubscriptions = async (
       .sort({ createdAt: -1 })
       .lean();
 
-    // Formatear datos bancarios para mostrar (ya solo tenemos los ultimos 4 digitos guardados)
-    const safeSubscriptions = subscriptions.map(sub => ({
-      ...sub,
-      bankDetails: {
-        ...sub.bankDetails,
-        cardNumber: `**** **** **** ${sub.bankDetails.cardNumber}`
-      }
-    }));
+    const safeSubscriptions = subscriptions.map(formatSafeSubscription);
 
     res.status(200).json({
       success: true,
@@ -394,4 +346,3 @@ export const getAllSubscriptions = async (
     });
   }
 };
-

@@ -1,3 +1,4 @@
+// configuración de conexión a mongodb para el servicio de clases
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 

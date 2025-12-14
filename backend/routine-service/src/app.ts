@@ -1,13 +1,12 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
 import connectDB from './config/database';
 import exerciseRoutes from './routes/exercise.routes';
 import routineRoutes from './routes/routine.routes';
 import userRoutineRoutes from './routes/userRoutine.routes';
-
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3005;
@@ -77,6 +76,8 @@ app.get('/', (req, res) => {
         getMyRoutine: 'GET /api/user-routines/me (socio)',
         createOrUpdateMyRoutine: 'POST /api/user-routines/me (socio)',
         addExercise: 'POST /api/user-routines/me/exercises (socio)',
+        updateExercise: 'PUT /api/user-routines/me/exercises/:exerciseIndex (socio)',
+        reorderExercises: 'POST /api/user-routines/me/exercises/reorder (socio)',
         removeExercise: 'DELETE /api/user-routines/me/exercises/:exerciseIndex (socio)',
         deleteMyRoutine: 'DELETE /api/user-routines/me (socio)'
       }
@@ -116,4 +117,3 @@ app.listen(port, () => {
 ╚═══════════════════════════════════════════════════════╝
   `);
 });
-

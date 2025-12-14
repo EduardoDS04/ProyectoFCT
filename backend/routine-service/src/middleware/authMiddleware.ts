@@ -103,6 +103,14 @@ export const isAdmin = (
   res: Response,
   next: NextFunction
 ): void => {
+  if (!req.userId) {
+    res.status(401).json({
+      success: false,
+      message: 'Usuario no autenticado'
+    });
+    return;
+  }
+  
   if (req.userRole !== UserRole.ADMIN) {
     res.status(403).json({
       success: false,
@@ -112,4 +120,3 @@ export const isAdmin = (
   }
   next();
 };
-

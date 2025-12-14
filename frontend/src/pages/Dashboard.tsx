@@ -170,13 +170,6 @@ const Dashboard = () => {
               <button className="card-button">Ver Mis Clases</button>
             </div>
 
-            <div className="dashboard-card clickable" onClick={() => window.location.href = '/classes/create'}>
-              <img src="/clases.png" alt="Crear Clase" className="dashboard-card-image" />
-              <h3>Crear Clase</h3>
-              <p>Añade una nueva clase</p>
-              <button className="card-button">Crear Clase</button>
-            </div>
-
             <div className="dashboard-card clickable" onClick={() => window.location.href = '/classes'}>
               <img src="/clases.png" alt="Todas las Clases" className="dashboard-card-image" />
               <h3>Todas las Clases</h3>
@@ -209,6 +202,13 @@ const Dashboard = () => {
               <h3>Crear Clase</h3>
               <p>Añadir nueva clase al sistema</p>
               <button className="card-button">Crear Clase</button>
+            </div>
+
+            <div className="dashboard-card clickable" onClick={() => window.location.href = '/admin/bookings'}>
+              <img src="/reserva.png" alt="Todas las Reservas" className="dashboard-card-image" />
+              <h3>Todas las Reservas</h3>
+              <p>Ver y gestionar todas las reservas del sistema</p>
+              <button className="card-button">Ver Reservas</button>
             </div>
 
             <div className="dashboard-card clickable" onClick={() => window.location.href = '/admin/users'}>

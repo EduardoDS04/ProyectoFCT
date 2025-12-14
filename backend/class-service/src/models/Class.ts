@@ -1,9 +1,11 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { ClassStatus } from '../types';
 
+// Interfaz TypeScript que define la estructura de un documento de clase en MongoDB
+// Extiende Document de Mongoose para incluir métodos y propiedades del documento
 export interface IClassDocument extends Document {
   name: string;
-  description: string;
+  description?: string;
   monitorId: string;
   monitorName: string;
   schedule: Date;
@@ -14,6 +16,8 @@ export interface IClassDocument extends Document {
   status: ClassStatus;
 }
 
+// Esquema de Mongoose que define la estructura, validaciones y restricciones de las clases
+// Cada campo tiene validaciones específicas para garantizar la integridad de los datos
 const ClassSchema: Schema = new Schema(
   {
     name: {
@@ -24,9 +28,9 @@ const ClassSchema: Schema = new Schema(
     },
     description: {
       type: String,
-      required: [true, 'La descripción es obligatoria'],
+      required: false,
       trim: true,
-      minlength: [10, 'La descripción debe tener al menos 10 caracteres']
+      default: ''
     },
     monitorId: {
       type: String,
@@ -80,7 +84,6 @@ const ClassSchema: Schema = new Schema(
 // Índices compuestos para optimizar búsquedas
 ClassSchema.index({ schedule: 1, status: 1 });
 ClassSchema.index({ monitorId: 1, schedule: 1 });
-ClassSchema.index({ status: 1, schedule: 1 });
 
 // Validación personalizada: currentParticipants no puede exceder maxParticipants
 ClassSchema.pre('save', function(next) {
@@ -92,15 +95,6 @@ ClassSchema.pre('save', function(next) {
   }
 });
 
-// Método para verificar si hay cupo disponible
-ClassSchema.methods.hasAvailableSlots = function(): boolean {
-  return this.currentParticipants < this.maxParticipants;
-};
-
-// Método para verificar si la clase está en el futuro
-ClassSchema.methods.isFuture = function(): boolean {
-  return new Date(this.schedule) > new Date();
-};
-
+// Exporta el modelo de Mongoose para poder realizar operaciones CRUD
 export default mongoose.model<IClassDocument>('Class', ClassSchema);
 

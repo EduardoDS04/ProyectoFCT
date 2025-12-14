@@ -13,6 +13,7 @@ import ClassForm from './pages/ClassForm';
 import MyClasses from './pages/MyClasses';
 import MyBookings from './pages/MyBookings';
 import ClassBookings from './pages/ClassBookings';
+import AllBookings from './pages/AllBookings';
 import AdminUsers from './pages/AdminUsers';
 import Payment from './pages/Payment';
 import QR from './pages/QR';
@@ -117,6 +118,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={[UserRole.MONITOR, UserRole.ADMIN]}>
               <ClassBookings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/bookings"
+          element={
+            <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+              <AllBookings />
             </ProtectedRoute>
           }
         />

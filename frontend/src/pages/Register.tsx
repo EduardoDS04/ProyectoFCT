@@ -12,6 +12,7 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    dni: '',
     phone: '',
     role: UserRole.SOCIO
   });
@@ -23,9 +24,16 @@ const Register = () => {
 
   // Manejar cambios en los campos del formulario
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    let value = e.target.value;
+    
+    // Si es el campo DNI, convertir a mayúsculas y limitar a 9 caracteres
+    if (e.target.name === 'dni') {
+      value = value.toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 9);
+    }
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: value
     });
   };
 
@@ -47,8 +55,9 @@ const Register = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        dni: formData.dni.toUpperCase().trim(),
         phone: formData.phone,
-        role: formData.role
+        role: UserRole.SOCIO
       };
       await register(registerData);
       navigate('/dashboard');
@@ -60,6 +69,7 @@ const Register = () => {
         email: '',
         password: '',
         confirmPassword: '',
+        dni: '',
         phone: '',
         role: UserRole.SOCIO
       });
@@ -105,6 +115,23 @@ const Register = () => {
           </div>
 
           <div className="form-group">
+            <label htmlFor="dni">DNI *</label>
+            <input
+              type="text"
+              id="dni"
+              name="dni"
+              value={formData.dni}
+              onChange={handleChange}
+              required
+              pattern="[0-9]{8}[A-Za-z]"
+              placeholder="12345678A"
+              maxLength={9}
+              disabled={isLoading}
+            />
+            <small>Formato: 8 dígitos y 1 letra</small>
+          </div>
+
+          <div className="form-group">
             <label htmlFor="phone">Teléfono (opcional)</label>
             <input
               type="tel"
@@ -115,22 +142,6 @@ const Register = () => {
               pattern="[0-9]{9,15}"
               disabled={isLoading}
             />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="role">Tipo de Usuario *</label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-              disabled={isLoading}
-            >
-              <option value={UserRole.SOCIO}>Socio</option>
-              <option value={UserRole.MONITOR}>Monitor</option>
-            </select>
-            <small>Los administradores son creados por otros administradores</small>
           </div>
 
           <div className="form-group">

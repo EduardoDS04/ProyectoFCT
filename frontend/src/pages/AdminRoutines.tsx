@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import routineService from '../services/routineService';
 import { getErrorMessage } from '../utils/errorHandler';
 import { getMuscleGroupLabel, getDifficultyLabel, getDayLabel, normalizeMuscleGroups, getMuscleGroupsLabel, toggleSetItem, getThumbnailUrl } from '../utils/routineHelpers';
@@ -8,12 +7,12 @@ import { MuscleGroup as MuscleGroupEnum, Difficulty as DifficultyEnum } from '..
 import '../styles/AdminRoutines.css';
 
 const AdminRoutines = () => {
-  const navigate = useNavigate();
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'routines' | 'exercises'>('routines');
+  // Set para almacenar los IDs de las rutinas expandidas, permite ver/ocultar ejercicios de cada rutina
   const [expandedRoutines, setExpandedRoutines] = useState<Set<string>>(new Set());
   
   // Estados para modales
@@ -43,6 +42,7 @@ const AdminRoutines = () => {
   }, []);
 
   // cargar rutinas y ejercicios desde la API
+  // Usa Promise.all para cargar ambos datos en paralelo
   const loadData = async () => {
     try {
       setLoading(true);
@@ -84,6 +84,7 @@ const AdminRoutines = () => {
       title: exercise.title,
       description: exercise.description,
       youtubeVideoId: exercise.youtubeVideoId,
+      // Normalizar grupos musculares para asegurar que siempre sea un array consistente
       muscleGroup: normalizeMuscleGroups(exercise.muscleGroup),
       difficulty: exercise.difficulty
     });
@@ -154,6 +155,7 @@ const AdminRoutines = () => {
       title: routine.title,
       description: routine.description,
       // Convertir exerciseId a string si viene como objeto
+      // Esto asegura que el formulario siempre trabaje con IDs como strings
       exercises: routine.exercises.map(ex => ({
         exerciseId: typeof ex.exerciseId === 'string' ? ex.exerciseId : ex.exerciseId._id,
         dayOfWeek: ex.dayOfWeek || 'lunes',
@@ -199,10 +201,10 @@ const AdminRoutines = () => {
       ...prev,
       exercises: [...prev.exercises, {
         exerciseId,
-        dayOfWeek: 'lunes',
-        sets: 3,
-        reps: '10',
-        weight: undefined
+        dayOfWeek: 'lunes', // Por defecto se asigna al lunes
+        sets: 3, // Valor por defecto de 3 series
+        reps: '10', // valor por defecto de 10 repeticiones (string para permitir rangos como "10-12")
+        weight: undefined // el peso es opcional, se puede configurar después
       }]
     }));
   };
@@ -216,6 +218,7 @@ const AdminRoutines = () => {
   };
 
   // Actualizar un campo específico de un ejercicio en la rutina
+  // Usa map para encontrar el ejercicio por índice y actualizar solo el campo especificado
   const updateRoutineExercise = (index: number, field: keyof CreateRoutineExerciseData, value: string | number | undefined) => {
     setRoutineForm(prev => ({
       ...prev,
@@ -225,6 +228,7 @@ const AdminRoutines = () => {
     }));
   };
 
+  // Mostrar estado de carga mientras se obtienen los datos de la API
   if (loading) {
     return (
       <div className="admin-routines-container">
@@ -238,9 +242,6 @@ const AdminRoutines = () => {
   return (
     <div className="admin-routines-container">
       <div className="admin-routines-header">
-        <button className="btn-back" onClick={() => navigate('/dashboard')}>
-          ← Volver al Dashboard
-        </button>
         <h1>Gestión de Rutinas y Ejercicios</h1>
       </div>
 
@@ -328,12 +329,12 @@ const AdminRoutines = () => {
                           <p className="no-exercises">Esta rutina no tiene ejercicios.</p>
                         ) : (
                           routine.exercises.map((routineExercise, index) => {
-                            // Obtener el ejercicio completo
+                            // Si es objeto, lo usamos directamente; si es string, lo buscamos en el array de ejercicios
                             const exercise = typeof routineExercise.exerciseId === 'object' 
                               ? routineExercise.exerciseId 
                               : exercises.find(ex => ex._id === routineExercise.exerciseId);
                             
-                            if (!exercise) return null;
+                            if (!exercise) return null; // Si no se encuentra el ejercicio, no renderizar nada
 
                             return (
                               <div key={index} className="exercise-mini-card">
@@ -579,6 +580,7 @@ const AdminRoutines = () => {
                   ) : (
                     <div className="exercises-add-list">
                       {exercises.map((exercise) => {
+                        // Verificar si el ejercicio ya está añadido a la rutina comparando IDs
                         const isInRoutine = routineForm.exercises.some(ex => ex.exerciseId === exercise._id);
                         return (
                           <div key={exercise._id} className="exercise-add-item">
@@ -611,6 +613,7 @@ const AdminRoutines = () => {
                                 </div>
                               </label>
                             </div>
+                            {/* Si el ejercicio está en la rutina, mostrar formulario para configurar series, reps, peso y día */}
                             {isInRoutine && (() => {
                               const exerciseIndex = routineForm.exercises.findIndex(ex => ex.exerciseId === exercise._id);
                               const routineExercise = routineForm.exercises[exerciseIndex];
@@ -680,6 +683,7 @@ const AdminRoutines = () => {
                 <button type="button" className="btn-cancel" onClick={closeRoutineModal}>
                   Cancelar
                 </button>
+                {/* Deshabilitar el botón si no hay ejercicios añadidos a la rutina */}
                 <button type="submit" className="btn-submit" disabled={routineForm.exercises.length === 0}>
                   {editingRoutine ? 'Guardar Cambios' : 'Crear Rutina'}
                 </button>

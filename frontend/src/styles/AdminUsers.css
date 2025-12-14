@@ -269,6 +269,35 @@
   color: #393;
 }
 
+/* Selector de rol */
+.role-select {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  border: 2px solid #3a3a3a;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  min-width: 100px;
+  max-width: 160px;
+}
+
+.role-select:hover {
+  border-color: #17769C;
+}
+
+.role-select:focus {
+  outline: none;
+  border-color: #17769C;
+}
+
+.role-select option {
+  background: #2a2a2a;
+  color: #ffffff;
+}
+
 /* Estado activo del usuario */
 .status-active {
   color: #22c55e;
@@ -301,10 +330,132 @@
   border-left: 4px solid #c33;
 }
 
+/* Mensaje de éxito */
+.success-message {
+  background: #efe;
+  color: #393;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #393;
+}
+
 .loading {
   text-align: center;
   padding: 3rem;
   font-size: 1.2rem;
   color: #666;
+}
+
+/* Botón de dar de baja usuario */
+.btn-deactivate-user {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-deactivate-user:hover {
+  opacity: 0.7;
+}
+
+.btn-deactivate-user img {
+  display: block;
+}
+
+/* Botón de eliminar usuario definitivamente */
+.btn-delete-user {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: 0.25rem;
+}
+
+.btn-delete-user:hover {
+  opacity: 0.7;
+}
+
+.btn-delete-user img {
+  display: block;
+}
+
+/* Modal de confirmación */
+.admin-users-container .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.admin-users-container .modal-content {
+  background: #2a2a2a !important;
+  border-radius: 10px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid #3a3a3a;
+}
+
+.admin-users-container .modal-content h3 {
+  color: #ffffff !important;
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.admin-users-container .modal-content p {
+  color: #ffffff !important;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.admin-users-container .modal-content p strong {
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.admin-users-container .modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.admin-users-container .btn-cancel-modal,
+.admin-users-container .btn-confirm-modal {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.admin-users-container .btn-cancel-modal {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #3a3a3a !important;
+}
+
+.admin-users-container .btn-cancel-modal:hover {
+  background: #000000 !important;
+  border-color: #3a3a3a !important;
+}
+
+.admin-users-container .btn-confirm-modal {
+  background: #dc3545 !important;
+  color: white !important;
 }
 

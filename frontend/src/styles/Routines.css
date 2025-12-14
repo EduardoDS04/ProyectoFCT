@@ -1,5 +1,6 @@
 /* Estilos para la página de Rutinas */
 
+/* Contenedor principal: fondo oscuro, centrado con ancho máximo */
 .routines-container {
   min-height: calc(100vh - 80px);
   padding: 2rem;
@@ -9,6 +10,7 @@
   margin: 0 auto;
 }
 
+/* Encabezado con título y botón de acción alineados */
 .routines-header {
   display: flex;
   justify-content: space-between;
@@ -43,6 +45,7 @@
   background-color: #1e8fb8;
 }
 
+/* Estados: carga, vacío y error */
 .routines-loading,
 .routines-empty {
   text-align: center;
@@ -80,6 +83,7 @@
   gap: 1.5rem;
 }
 
+/* Tarjeta de ejercicio clickeable: efecto hover con elevación y zoom en thumbnail */
 .exercise-card-clickable {
   background-color: #2a2a2a;
   border: 1px solid #3a3a3a;
@@ -294,6 +298,7 @@
   transform: scale(1.05);
 }
 
+/* Overlay de reproducción: aparece al hacer hover sobre el thumbnail */
 .play-overlay {
   position: absolute;
   top: 0;
@@ -367,11 +372,12 @@
   font-weight: 500;
 }
 
-/* Sección Mi Rutina */
+/* Sección Mi Rutina: vista de la rutina personalizada del usuario */
 .my-routine-section {
   margin-top: 2rem;
 }
 
+/* Encabezado con título y selector de día */
 .my-routine-header {
   display: flex;
   justify-content: space-between;
@@ -420,12 +426,14 @@
   border-color: #17769C;
 }
 
+/* Grid de ejercicios de mi rutina: layout responsivo */
 .my-routine-exercises-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 }
 
+/* Tarjeta de ejercicio en mi rutina: con acciones de editar, eliminar y reordenar */
 .my-routine-exercise-card {
   background-color: #2a2a2a;
   border: 1px solid #3a3a3a;
@@ -549,6 +557,7 @@
   font-weight: 600;
 }
 
+/* Notas del ejercicio: */
 .exercise-card-notes {
   margin-top: 0.5rem;
   padding: 0.75rem;
@@ -641,7 +650,7 @@
   background-color: #a03030;
 }
 
-/* Modal de Ejercicio */
+/* Modal de Ejercicio: overlay fijo que cubre toda la pantalla */
 .exercise-modal-overlay {
   position: fixed;
   top: 0;
@@ -767,7 +776,7 @@
   text-transform: capitalize;
 }
 
-/* Formulario de ejercicio */
+/* Formulario de ejercicio: para añadir o editar ejercicio en la rutina personalizada */
 .exercise-form {
   margin-top: 2rem;
   padding-top: 2rem;
@@ -847,18 +856,20 @@
   cursor: not-allowed;
 }
 
-/* Responsive */
+/* Responsive: ajustes para pantallas móviles */
 @media (max-width: 768px) {
   .routines-container {
     padding: 1rem;
   }
 
+  /* Encabezados apilados verticalmente en móvil */
   .routines-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
 
+  /* Grids en una sola columna en móvil */
   .routine-exercises {
     grid-template-columns: 1fr;
   }

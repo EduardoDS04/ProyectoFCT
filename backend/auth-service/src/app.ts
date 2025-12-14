@@ -67,16 +67,13 @@ app.get('/', (req, res) => {
         changePassword: 'PUT /api/auth/change-password (protected)'
       },
       admin: {
-        stats: 'GET /api/admin/stats (admin only)',
         users: 'GET /api/admin/users (admin only)',
-        createAdmin: 'POST /api/admin/users/create-admin (admin only)',
         updateRole: 'PUT /api/admin/users/:id/role (admin only)',
         toggleActive: 'PUT /api/admin/users/:id/toggle-active (admin only)',
         deleteUser: 'DELETE /api/admin/users/:id (admin only)'
       },
       qr: {
         getMyQR: 'GET /api/qr/me (protected)',
-        validateQR: 'POST /api/qr/validate (protected)'
       }
     }
   });

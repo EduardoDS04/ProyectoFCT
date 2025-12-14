@@ -1,5 +1,6 @@
 /* Estilos para la página de administración de rutinas */
 
+/* Contenedor principal: fondo oscuro, centrado con ancho máximo y altura mínima */
 .admin-routines-container {
   min-height: calc(100vh - 80px);
   padding: 2rem;
@@ -9,6 +10,7 @@
   margin: 0 auto;
 }
 
+/* Encabezado de la página */
 .admin-routines-header {
   margin-bottom: 2rem;
 }
@@ -19,6 +21,7 @@
   margin: 1rem 0;
 }
 
+/* Botón de retroceso con estilo teal y efecto hover */
 .btn-back {
   background: #2E7F85;
   color: #ffffff;
@@ -36,6 +39,7 @@
   background: #256a6f;
 }
 
+/* Estados de carga y vacío: centrados con padding */
 .admin-routines-loading,
 .admin-routines-empty {
   text-align: center;
@@ -43,6 +47,7 @@
   color: #aaa;
 }
 
+/* Mensaje de error*/
 .admin-routines-error {
   padding: 1rem;
   background-color: #4a1a1a;
@@ -56,7 +61,7 @@
   margin: 0;
 }
 
-/* Tabs */
+/* Tabs: sistema de pestañas para alternar entre rutinas y ejercicios */
 .admin-routines-tabs {
   display: flex;
   gap: 1rem;
@@ -64,6 +69,7 @@
   border-bottom: 2px solid #3a3a3a;
 }
 
+/* Botón de pestaña: sin fondo, con borde inferior transparente que se activa al seleccionar */
 .tab-button {
   background: none;
   border: none;
@@ -81,17 +87,19 @@
   color: #ffffff;
 }
 
+/* Pestaña activa: color azul con borde inferior visible */
 .tab-button.active {
   color: #17769C;
   border-bottom-color: #17769C;
 }
 
-/* Secciones */
+/* Secciones principales: rutinas y ejercicios */
 .admin-routines-section,
 .admin-exercises-section {
   margin-top: 2rem;
 }
 
+/* Encabezado de sección: título y botón de crear alineados horizontalmente */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -105,6 +113,7 @@
   margin: 0;
 }
 
+/* Botón de crear: estilo azul principal con hover más claro */
 .btn-create {
   padding: 0.75rem 1.5rem;
   background-color: #17769C;
@@ -121,13 +130,14 @@
   background-color: #1e8fb8;
 }
 
-/* Lista de rutinas */
+/* Lista de rutinas: layout vertical con espaciado entre tarjetas */
 .routines-list {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
+/* Tarjeta de rutina: fondo oscuro con borde, efecto hover que cambia color y añade sombra */
 .routine-card {
   background-color: #2a2a2a;
   border: 1px solid #3a3a3a;
@@ -166,6 +176,7 @@
   align-items: center;
 }
 
+/* Botón de expandir/colapsar: flecha que rota 180 grados cuando está expandido */
 .routine-expand-btn {
   background: none;
   border: none;
@@ -185,6 +196,7 @@
   transform: rotate(180deg);
 }
 
+/* Botones de acción: editar (teal) y eliminar (rojo) */
 .btn-edit,
 .btn-delete {
   padding: 0.4rem 0.8rem;
@@ -214,6 +226,7 @@
   background-color: #a03030;
 }
 
+/* Grid de ejercicios dentro de una rutina: layout responsivo con columnas automáticas */
 .routine-exercises {
   margin-top: 1.5rem;
   display: grid;
@@ -305,7 +318,7 @@
   font-size: 0.75rem;
 }
 
-/* Grid de ejercicios */
+/* Grid de ejercicios: layout responsivo con columnas de mínimo 300px */
 .exercises-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -341,6 +354,7 @@
   font-size: 1.2rem;
 }
 
+/* Descripción de ejercicio: truncada a 2 líneas con ellipsis usando webkit */
 .exercise-description {
   color: #aaa;
   margin: 0 0 1rem 0;
@@ -390,7 +404,7 @@
   margin-top: 1.5rem;
 }
 
-/* Modales */
+/* Modales: overlay fijo que cubre toda la pantalla con fondo semitransparente */
 .admin-modal-overlay {
   position: fixed;
   top: 0;
@@ -468,6 +482,7 @@
   font-weight: 500;
 }
 
+/* Campos de formulario: inputs, textareas y selects con estilo oscuro y borde azul */
 .form-group input[type="text"],
 .form-group input[type="number"],
 .form-group textarea,
@@ -554,7 +569,7 @@
   cursor: not-allowed;
 }
 
-/* Selector de ejercicios */
+/* Selector de ejercicios: contenedor con scroll vertical limitado a 400px de altura */
 .exercises-selector {
   max-height: 400px;
   overflow-y: auto;
@@ -657,7 +672,7 @@
   font-size: 0.75rem;
 }
 
-/* Selector de grupos musculares */
+/* Selector de grupos musculares: grid responsivo con columnas de mínimo 150px */
 .muscle-groups-checkbox-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -703,12 +718,13 @@
   font-size: 0.875rem;
 }
 
-/* Responsive */
+/* Responsive: ajustes para pantallas móviles (máximo 768px) */
 @media (max-width: 768px) {
   .admin-routines-container {
     padding: 1rem;
   }
 
+  /* Encabezados de sección y rutina apilados verticalmente en móvil */
   .section-header {
     flex-direction: column;
     align-items: flex-start;
@@ -724,6 +740,7 @@
     justify-content: flex-end;
   }
 
+  /* Grid de ejercicios en una sola columna en móvil */
   .exercises-grid {
     grid-template-columns: 1fr;
   }

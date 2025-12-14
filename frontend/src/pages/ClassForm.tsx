@@ -26,18 +26,25 @@ const ClassForm = () => {
 
   // Cargar datos de la clase si estamos en modo edicion
   useEffect(() => {
-    if (isEdit && id) {
+    if (isEdit && id && user) {
       loadClass();
     }
-  }, [id, isEdit]);
+  }, [id, isEdit, user]);
 
   // Cargar datos de la clase para edicion
   const loadClass = async () => {
     try {
+      if (!user) {
+        return;
+      }
+
       const classData = await classService.getClassById(id!);
       
-      // Verificar permisos
-      if (user?.role !== 'admin' && classData.monitorId !== user?.id) {
+      // Verificar permisos - convertir ambos IDs a string para comparación segura
+      const monitorIdStr = String(classData.monitorId);
+      const userIdStr = String(user.id);
+      
+      if (user.role !== 'admin' && monitorIdStr !== userIdStr) {
         alert('No tienes permisos para editar esta clase');
         navigate('/classes');
         return;
@@ -156,15 +163,13 @@ const ClassForm = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Descripción *</label>
+            <label htmlFor="description">Descripción</label>
             <textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Describe la clase, nivel de dificultad, etc."
-              required
-              minLength={10}
+              placeholder="Describe la clase, nivel de dificultad, etc. (opcional)"
               rows={4}
               disabled={loading}
             />

@@ -8,7 +8,6 @@ import {
 } from '../controllers/authController';
 import {
   checkDuplicateEmail,
-  checkRoleExists,
   validateRequiredFields
 } from '../middleware/verifySignUp';
 import { verifyToken } from '../middleware/authJwt';
@@ -22,7 +21,7 @@ const router = Router();
 // POST /api/auth/register - Registro de usuario
 router.post(
   '/register',
-  [validateRequiredFields, checkDuplicateEmail, checkRoleExists],
+  [validateRequiredFields, checkDuplicateEmail],
   register
 );
 

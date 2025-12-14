@@ -7,15 +7,15 @@ export interface IFeedbackMessage {
   senderId: mongoose.Types.ObjectId; // ID del remitente
   senderName: string; // Nombre del remitente
   senderRole: 'admin' | 'socio'; // Rol del remitente
-  message: string; // Contenido del mensaje
-  createdAt: Date; // Fecha de creacion del mensaje
+  message: string; 
+  createdAt: Date; 
 }
 
 // Interfaz que define la estructura de un documento de feedback en la base de datos
 export interface IFeedbackDocument extends Document {
   userId: mongoose.Types.ObjectId; // ID del usuario que envio el feedback inicial
   userName: string; // Nombre del usuario que envio el feedback inicial
-  message: string; // Contenido del mensaje inicial (queja, valoracion o duda)
+  message: string; // Contenido del mensaje inicial
   type: FeedbackType; // Tipo de feedback (queja, valoracion, duda)
   messages: IFeedbackMessage[]; // Array de mensajes de la conversacion
   lastReadBySocio?: Date; // Fecha en que el socio leyo por ultima vez los mensajes
@@ -32,8 +32,7 @@ const FeedbackSchema = new Schema<IFeedbackDocument>(
     // Referencia al usuario que envio el feedback
     userId: {
       type: Schema.Types.ObjectId,
-      required: true,
-      index: true // Indice para busquedas rapidas por usuario
+      required: true
     },
     // Nombre del usuario que envio el feedback
     userName: {
@@ -105,8 +104,6 @@ const FeedbackSchema = new Schema<IFeedbackDocument>(
 // Indice compuesto para optimizar busquedas frecuentes
 FeedbackSchema.index({ userId: 1, createdAt: -1 });
 FeedbackSchema.index({ type: 1, createdAt: -1 });
-// Indice para buscar feedbacks con mensajes sin leer
-FeedbackSchema.index({ 'messages.createdAt': -1 });
 
 // Modelo de Mongoose para la coleccion de feedbacks
 const Feedback = mongoose.model<IFeedbackDocument>('Feedback', FeedbackSchema);

@@ -3,405 +3,206 @@ import Class from '../models/Class';
 import Booking from '../models/Booking';
 import { AuthRequest, CreateClassDTO, UpdateClassDTO, ClassStatus, UserRole, BookingStatus } from '../types';
 
-/**
- * Obtener todas las clases
- * GET /api/classes
- */
+// helpers para respuestas
+const sendError = (res: Response, status: number, message: string) => {
+  res.status(status).json({ success: false, message });
+};
+
+const sendNotFound = (res: Response, entity: string) => sendError(res, 404, `${entity} no encontrada`);
+
+const sendForbidden = (res: Response, message: string) => sendError(res, 403, message);
+
+// marcar clases pasadas como completadas y sus reservas
+const markCompletedClasses = async () => {
+  const now = new Date();
+  const classesToComplete = await Class.find({
+    status: ClassStatus.ACTIVE,
+    $expr: { $lt: [{ $add: ['$schedule', { $multiply: ['$duration', 60000] }] }, now] }
+  }).select('_id');
+  
+  const classIds = classesToComplete.map(c => c._id);
+  if (classIds.length > 0) {
+    await Class.updateMany({ _id: { $in: classIds } }, { status: ClassStatus.COMPLETED });
+    await Booking.updateMany({ classId: { $in: classIds }, status: BookingStatus.CONFIRMED }, { status: BookingStatus.COMPLETED });
+  }
+};
+
+// verificar permisos de clase
+const canModifyClass = (req: AuthRequest, classData: any): boolean => {
+  return req.userRole === UserRole.ADMIN || classData.monitorId === req.userId;
+};
+
+// verificar conflicto de horario del monitor
+const hasScheduleConflict = async (monitorId: string, schedule: Date, excludeId?: string) => {
+  const filter: any = { monitorId, schedule, status: { $ne: ClassStatus.CANCELLED } };
+  if (excludeId) filter._id = { $ne: excludeId };
+  return await Class.findOne(filter);
+};
+
+// obtener todas las clases con filtros opcionales
 export const getAllClasses = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { status, monitorId, fromDate, toDate } = req.query;
-
-    // Construir filtro dinámico
     const filter: any = {};
-
-    if (status) {
-      filter.status = status;
-    }
-
-    if (monitorId) {
-      filter.monitorId = monitorId;
-    }
-
-    // Filtro por rango de fechas
+    if (status) filter.status = status;
+    if (monitorId) filter.monitorId = monitorId;
     if (fromDate || toDate) {
       filter.schedule = {};
-      if (fromDate) {
-        filter.schedule.$gte = new Date(fromDate as string);
-      }
-      if (toDate) {
-        filter.schedule.$lte = new Date(toDate as string);
-      }
+      if (fromDate) filter.schedule.$gte = new Date(fromDate as string);
+      if (toDate) filter.schedule.$lte = new Date(toDate as string);
     }
 
-    // Marcar automáticamente TODAS las clases pasadas como completadas (si no estan canceladas)
-    // Esto se hace antes de aplicar el filtro para asegurar que todas las clases pasadas se marquen
-    const now = new Date();
-    await Class.updateMany(
-      {
-        status: ClassStatus.ACTIVE,
-        $expr: {
-          $lt: [
-            { $add: ['$schedule', { $multiply: ['$duration', 60000] }] },
-            now
-          ]
-        }
-      },
-      { status: ClassStatus.COMPLETED }
-    );
-
-    // Ahora obtener las clases con el filtro aplicado
-    let classes = await Class.find(filter).sort({ schedule: 1 });
-
-    res.status(200).json({
-      success: true,
-      data: classes,
-      count: classes.length
-    });
+    // marcar automáticamente clases pasadas como completadas antes de filtrar
+    await markCompletedClasses();
+    const classes = await Class.find(filter).sort({ schedule: 1 });
+    res.status(200).json({ success: true, data: classes, count: classes.length });
   } catch (error) {
     console.error('Error al obtener clases:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener clases'
-    });
+    sendError(res, 500, 'Error al obtener clases');
   }
 };
 
-/**
- * Obtener una clase por ID
- * GET /api/classes/:id
- */
+// obtener una clase específica por ID
 export const getClassById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
-
-    const classData = await Class.findById(id);
-
-    if (!classData) {
-      res.status(404).json({
-        success: false,
-        message: 'Clase no encontrada'
-      });
-      return;
-    }
-
-    res.status(200).json({
-      success: true,
-      data: classData
-    });
+    const classData = await Class.findById(req.params.id);
+    if (!classData) return sendNotFound(res, 'Clase');
+    res.status(200).json({ success: true, data: classData });
   } catch (error) {
     console.error('Error al obtener clase:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener clase'
-    });
+    sendError(res, 500, 'Error al obtener clase');
   }
 };
 
-/**
- * Crear nueva clase (Solo Monitor o Admin)
- * POST /api/classes
- */
+// crear una nueva clase (solo Monitor o Admin)
 export const createClass = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { name, description, schedule, duration, maxParticipants, room }: CreateClassDTO = req.body;
-
-    // Validar campos requeridos
-    if (!name || !description || !schedule || !duration || !maxParticipants || !room) {
-      res.status(400).json({
-        success: false,
-        message: 'Todos los campos son obligatorios'
-      });
-      return;
+    if (!name || !schedule || !duration || !maxParticipants || !room) {
+      return sendError(res, 400, 'Todos los campos son obligatorios excepto la descripción');
     }
 
-    // Validar que la fecha sea futura
+    // validar que la fecha sea futura
     const classDate = new Date(schedule);
-    if (classDate <= new Date()) {
-      res.status(400).json({
-        success: false,
-        message: 'La fecha de la clase debe ser futura'
-      });
-      return;
+    if (classDate <= new Date()) return sendError(res, 400, 'La fecha de la clase debe ser futura');
+
+    // verificar que el monitor no tenga otra clase en el mismo horario
+    if (await hasScheduleConflict(req.userId!, classDate)) {
+      return sendError(res, 400, 'Ya tienes una clase programada en esta fecha y hora. No puedes estar en dos lugares al mismo tiempo.');
     }
 
-    // Validar que el monitor no tenga otra clase en el mismo día y hora
-    const monitorId = req.userId!;
-    const existingClass = await Class.findOne({
-      monitorId,
-      schedule: classDate,
-      status: { $ne: ClassStatus.CANCELLED } // No considerar clases canceladas
-    });
-
-    if (existingClass) {
-      res.status(400).json({
-        success: false,
-        message: 'Ya tienes una clase programada en esta fecha y hora. No puedes estar en dos lugares al mismo tiempo.'
-      });
-      return;
-    }
-
-    // Crear la clase
-    const newClass = new Class({
-      name,
-      description,
-      monitorId: req.userId!,
+    const newClass = await Class.create({
+      name, 
+      description: description || '', 
+      monitorId: req.userId!, 
       monitorName: req.userName!,
-      schedule: classDate,
-      duration,
-      maxParticipants,
-      currentParticipants: 0,
+      schedule: classDate, 
+      duration, 
+      maxParticipants, 
+      currentParticipants: 0, 
       room,
       status: ClassStatus.ACTIVE
     });
 
-    await newClass.save();
-
-    res.status(201).json({
-      success: true,
-      message: 'Clase creada exitosamente',
-      data: newClass
-    });
+    res.status(201).json({ success: true, message: 'Clase creada exitosamente', data: newClass });
   } catch (error) {
     console.error('Error al crear clase:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al crear clase'
-    });
+    sendError(res, 500, 'Error al crear clase');
   }
 };
 
-/**
- * Actualizar clase (Solo el monitor creador o admin)
- * PUT /api/classes/:id
- */
+// actualizar una clase existente (solo el monitor creador o admin)
 export const updateClass = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const updates: UpdateClassDTO = req.body;
-
     const classData = await Class.findById(id);
-
-    if (!classData) {
-      res.status(404).json({
-        success: false,
-        message: 'Clase no encontrada'
-      });
-      return;
-    }
-
-    // Verificar permisos: solo el monitor creador o admin
-    if (req.userRole !== UserRole.ADMIN && classData.monitorId !== req.userId) {
-      res.status(403).json({
-        success: false,
-        message: 'Solo el monitor de la clase o un administrador pueden actualizarla'
-      });
-      return;
-    }
-
-    // No permitir editar clases canceladas o completadas
+    
+    if (!classData) return sendNotFound(res, 'Clase');
+    if (!canModifyClass(req, classData)) return sendForbidden(res, 'Solo el monitor de la clase o un administrador pueden actualizarla');
     if (classData.status === ClassStatus.CANCELLED || classData.status === ClassStatus.COMPLETED) {
-      res.status(400).json({
-        success: false,
-        message: 'No se pueden editar clases canceladas o completadas'
-      });
-      return;
+      return sendError(res, 400, 'No se pueden editar clases canceladas o completadas');
     }
+    if (new Date(classData.schedule) < new Date()) return sendError(res, 400, 'No se pueden editar clases que ya han finalizado');
 
-    // No permitir editar clases que ya han pasado
-    if (new Date(classData.schedule) < new Date()) {
-      res.status(400).json({
-        success: false,
-        message: 'No se pueden editar clases que ya han finalizado'
-      });
-      return;
-    }
-
-    // Si se actualiza la fecha, validar que sea futura y que no haya conflicto
+    // si se actualiza la fecha, validar conflictos de horario
     if (updates.schedule) {
       const newDate = new Date(updates.schedule);
-      if (newDate <= new Date()) {
-        res.status(400).json({
-          success: false,
-          message: 'La fecha de la clase debe ser futura'
-        });
-        return;
-      }
-
-      // Validar que el monitor no tenga otra clase en el mismo día y hora (excluyendo la clase actual)
+      if (newDate <= new Date()) return sendError(res, 400, 'La fecha de la clase debe ser futura');
       const monitorId = req.userRole === UserRole.ADMIN ? classData.monitorId : req.userId!;
-      const existingClass = await Class.findOne({
-        _id: { $ne: id }, // Excluir la clase actual
-        monitorId,
-        schedule: newDate,
-        status: { $ne: ClassStatus.CANCELLED } // No considerar clases canceladas
-      });
-
-      if (existingClass) {
-        res.status(400).json({
-          success: false,
-          message: 'El monitor ya tiene una clase programada en esta fecha y hora. No puede estar en dos lugares al mismo tiempo.'
-        });
-        return;
+      if (await hasScheduleConflict(monitorId, newDate, id)) {
+        return sendError(res, 400, 'El monitor ya tiene una clase programada en esta fecha y hora. No puede estar en dos lugares al mismo tiempo.');
       }
-
       updates.schedule = newDate;
     }
 
-    // Si se reduce maxParticipants, verificar que no sea menor a currentParticipants
+    // validar que no se reduzca el aforo por debajo de participantes actuales
     if (updates.maxParticipants !== undefined && updates.maxParticipants < classData.currentParticipants) {
-      res.status(400).json({
-        success: false,
-        message: `No puedes reducir el aforo por debajo del número actual de participantes (${classData.currentParticipants})`
-      });
-      return;
+      return sendError(res, 400, `No puedes reducir el aforo por debajo del número actual de participantes (${classData.currentParticipants})`);
     }
 
-    // Actualizar
     Object.assign(classData, updates);
     await classData.save();
-
-    res.status(200).json({
-      success: true,
-      message: 'Clase actualizada exitosamente',
-      data: classData
-    });
+    res.status(200).json({ success: true, message: 'Clase actualizada exitosamente', data: classData });
   } catch (error) {
     console.error('Error al actualizar clase:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al actualizar clase'
-    });
+    sendError(res, 500, 'Error al actualizar clase');
   }
 };
 
-/**
- * Cancelar clase (Solo el monitor creador o admin)
- * PUT /api/classes/:id/cancel
- */
+// cancelar una clase (solo el monitor creador o admin)
 export const cancelClass = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-
     const classData = await Class.findById(id);
+    if (!classData) return sendNotFound(res, 'Clase');
+    if (!canModifyClass(req, classData)) return sendForbidden(res, 'Solo el monitor de la clase o un administrador pueden cancelarla');
+    if (classData.status === ClassStatus.CANCELLED) return sendError(res, 400, 'La clase ya está cancelada');
 
-    if (!classData) {
-      res.status(404).json({
-        success: false,
-        message: 'Clase no encontrada'
-      });
-      return;
-    }
-
-    // Verificar permisos
-    if (req.userRole !== UserRole.ADMIN && classData.monitorId !== req.userId) {
-      res.status(403).json({
-        success: false,
-        message: 'Solo el monitor de la clase o un administrador pueden cancelarla'
-      });
-      return;
-    }
-
-    // cancelada
-    if (classData.status === ClassStatus.CANCELLED) {
-      res.status(400).json({
-        success: false,
-        message: 'La clase ya está cancelada'
-      });
-      return;
-    }
-
-    // Cancelar clase
     classData.status = ClassStatus.CANCELLED;
     await classData.save();
+    // cancelar automáticamente todas las reservas confirmadas de la clase
+    await Booking.updateMany({ classId: id, status: BookingStatus.CONFIRMED }, { status: BookingStatus.CANCELLED });
 
-    // Cancelar todas las reservas asociadas
-    await Booking.updateMany(
-      { classId: id, status: BookingStatus.CONFIRMED },
-      { status: BookingStatus.CANCELLED }
-    );
-
-    res.status(200).json({
-      success: true,
-      message: 'Clase cancelada exitosamente. Se han cancelado todas las reservas.',
-      data: classData
-    });
+    res.status(200).json({ success: true, message: 'Clase cancelada exitosamente. Se han cancelado todas las reservas.', data: classData });
   } catch (error) {
     console.error('Error al cancelar clase:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al cancelar clase'
-    });
+    sendError(res, 500, 'Error al cancelar clase');
   }
 };
 
-/**
- * Eliminar clase (Solo admin)
- * DELETE /api/classes/:id
- */
+// eliminar una clase permanentemente (solo admin)
 export const deleteClass = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-
     const classData = await Class.findById(id);
-
-    if (!classData) {
-      res.status(404).json({
-        success: false,
-        message: 'Clase no encontrada'
-      });
-      return;
-    }
-
-    // Verificar si tiene reservas activas
-    const activeBookings = await Booking.countDocuments({
-      classId: id,
-      status: BookingStatus.CONFIRMED
-    });
-
+    if (!classData) return sendNotFound(res, 'Clase');
+    
+    // verificar que no tenga reservas activas antes de eliminar
+    const activeBookings = await Booking.countDocuments({ classId: id, status: BookingStatus.CONFIRMED });
     if (activeBookings > 0) {
-      res.status(400).json({
-        success: false,
-        message: `No se puede eliminar la clase porque tiene ${activeBookings} reserva(s) activa(s). Cancela la clase primero.`
-      });
-      return;
+      return sendError(res, 400, `No se puede eliminar la clase porque tiene ${activeBookings} reserva(s) activa(s). Cancela la clase primero.`);
     }
 
-    // Eliminar clase y sus reservas canceladas
-    await Class.findByIdAndDelete(id);
+    // eliminar primero todas las reservas asociadas (para evitar reservas huérfanas)
     await Booking.deleteMany({ classId: id });
-
-    res.status(200).json({
-      success: true,
-      message: 'Clase eliminada exitosamente'
-    });
+    // luego eliminar la clase
+    await Class.findByIdAndDelete(id);
+    res.status(200).json({ success: true, message: 'Clase eliminada exitosamente' });
   } catch (error) {
     console.error('Error al eliminar clase:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al eliminar clase'
-    });
+    sendError(res, 500, 'Error al eliminar clase');
   }
 };
 
-/**
- * Obtener clases del monitor autenticado
- * GET /api/classes/my-classes
- */
+// obtener las clases creadas por el monitor autenticado
 export const getMyClasses = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const classes = await Class.find({ monitorId: req.userId }).sort({ schedule: 1 });
-
-    res.status(200).json({
-      success: true,
-      data: classes,
-      count: classes.length
-    });
+    res.status(200).json({ success: true, data: classes, count: classes.length });
   } catch (error) {
     console.error('Error al obtener mis clases:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error al obtener clases'
-    });
+    sendError(res, 500, 'Error al obtener clases');
   }
 };
 

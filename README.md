@@ -104,9 +104,30 @@ La comunicación entre servicios se realiza mediante JWT tokens que contienen la
 
 ## Roles de Usuario
 
-- **Socio**: Puede ver clases y realizar reservas, gestionar suscripciones, enviar feedback, acceder con QR, y crear rutinas personalizadas
-- **Monitor**: Puede crear y gestionar sus clases
-- **Admin**: Acceso completo al sistema
+- **Socio**: 
+  - Ver clases disponibles y realizar reservas (requiere suscripción activa)
+  - Gestionar suscripciones y pagos
+  - Enviar feedback y recibir respuestas
+  - Acceder con código QR (solo con suscripción activa)
+  - Crear y gestionar rutinas personalizadas
+  - Ver sus reservas con filtros (Todas, Confirmadas, Canceladas, Completadas)
+  - Las reservas completadas se ocultan después de 7 días
+
+- **Monitor**: 
+  - Crear y gestionar sus propias clases
+  - Editar y cancelar sus clases
+  - Ver reservas de sus clases
+  - Acceder con código QR desde el registro
+
+- **Admin**: 
+  - Acceso completo al sistema
+  - Gestión completa de usuarios
+  - Ver todas las clases y reservas del sistema
+  - Crear, editar, cancelar y eliminar cualquier clase
+  - Gestionar ejercicios y rutinas predefinidas
+  - Responder a feedbacks y gestionar notificaciones
+  - Ver todas las suscripciones
+  - Acceder con código QR desde el registro
 
 ## Requisitos Previos
 
@@ -169,6 +190,9 @@ MONGODB_URI=mongodb://admin:password1234@localhost:27017/gimnasio_classes?authSo
 
 # Auth Service URL (para comunicación entre microservicios)
 AUTH_SERVICE_URL=http://localhost:3001
+
+# Payment Service URL (para validación de suscripciones)
+PAYMENT_SERVICE_URL=http://localhost:3003
 
 # CORS Origins (separados por comas)
 CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3001
@@ -361,16 +385,13 @@ El frontend estará disponible en: http://localhost:5173
 - `PUT /api/auth/change-password` - Cambiar contraseña
 
 #### Admin
-- `GET /api/admin/stats` - Estadísticas del sistema
 - `GET /api/admin/users` - Listar todos los usuarios
-- `POST /api/admin/users/create-admin` - Crear administrador
 - `PUT /api/admin/users/:id/role` - Actualizar rol de usuario
 - `PUT /api/admin/users/:id/toggle-active` - Activar/desactivar usuario
 - `DELETE /api/admin/users/:id` - Eliminar usuario
 
 #### QR de Acceso
 - `GET /api/qr/me` - Obtener mi código QR (regenera automáticamente si expiró)
-- `POST /api/qr/validate` - Validar QR escaneado (para uso futuro)
 
 ### Class Service (http://localhost:3002)
 
@@ -449,33 +470,54 @@ El frontend estará disponible en: http://localhost:5173
 
 ## Características Principales
 ### Autenticación y Autorización
-- Registro de usuarios con validación
+- Registro de usuarios con validación completa
+- Email único por usuario
+- DNI único por usuario (obligatorio, formato: 8 dígitos + 1 letra)
+- Teléfono único por usuario (opcional)
+- Todos los usuarios se registran como SOCIO por defecto (seguridad)
 - Login con JWT
 - Middleware de protección de rutas
 - Roles de usuario (Socio, Monitor, Admin)
+- Cambio de rol de usuario por administradores (con validaciones)
 
 ### Gestión de Clases
 - Crear clases (Monitor/Admin)
-- Editar y cancelar clases
+- Editar y cancelar clases (Monitor solo sus propias clases, Admin todas)
+- Eliminar clases (solo Admin)
+- Descripción de clase opcional
 - Ver todas las clases disponibles
 - Filtrar por estado (Activa, Cancelada, Completada)
+- Para socios: clases canceladas y completadas se ocultan después de 7 días
+- Marcado automático de clases pasadas como completadas
+- Cancelación automática de reservas al cancelar una clase
 
 ### Sistema de Reservas
-- Reservar plazas en clases
+- Reservar plazas en clases (requiere suscripción activa)
 - Cancelar reservas
 - Control de cupos disponibles
-- Validacion de reservas duplicadas
+- Validación de reservas duplicadas
+- Deduplicación automática: si un usuario reserva, cancela y vuelve a reservar, solo se muestra la reserva confirmada
+- Para socios: reservas completadas se ocultan después de 7 días
+- Ver reservas de una clase (Monitor/Admin)
+- Ver todas las reservas del sistema (Admin)
 
 ### Panel de Administración
-- Gestión de usuarios
-- Estadísticas del sistema
-- Control de accesos
+- Gestión completa de usuarios
+- Visualización de DNI de usuarios
+- Cambio de rol de usuario (con validaciones)
+  - No se puede cambiar el rol si el usuario tiene reservas activas
+  - Un administrador no puede cambiar su propio rol
+- Activar/desactivar usuarios
+- Eliminar usuarios
+
 
 ### Sistema de Pagos y Suscripciones
 - Suscripciones mensuales, trimestrales y anuales
 - Gestión de datos bancarios (simulado)
 - Historial de suscripciones
 - Cancelación de suscripciones
+- Validación de suscripción activa requerida para reservar clases
+- Verificación automática de suscripción antes de permitir reservas
 
 ### Sistema de Feedback y Notificaciones
 - **Envío de Feedback**: Los socios pueden enviar feedback (quejas, valoraciones o dudas) con mensajes de hasta 3000 caracteres
@@ -510,9 +552,10 @@ El frontend estará disponible en: http://localhost:5173
 
 ### Sistema de Rutinas y Ejercicios
 - **Ejercicios Base**: Catálogo de ejercicios con videos de YouTube, descripción, grupo muscular y nivel de dificultad
-- **Rutinas Predefinidas**: Rutinas creadas por administradores con ejercicios seleccionados
+- **Rutinas Predefinidas**: Rutinas creadas por administradores con ejercicios seleccionados y días de la semana asignados
 - **Rutinas Personalizadas**: Los socios pueden crear su propia rutina personalizada
-- **Personalización de Ejercicios**: Los socios pueden añadir ejercicios a su rutina personalizando series, repeticiones y peso
+- **Personalización de Ejercicios**: Los socios pueden añadir ejercicios a su rutina personalizando series, repeticiones, peso (opcional) y día de la semana
+- **Filtrado por Día**: Los socios pueden filtrar ejercicios por día de la semana en su rutina personalizada
 - **Integración con YouTube**: Videos embebidos de YouTube para demostración de ejercicios
 - **Filtros y Búsqueda**: Filtrado por grupo muscular, dificultad y búsqueda por texto
 - **Gestión Completa**: CRUD completo de ejercicios y rutinas para administradores
@@ -525,6 +568,43 @@ El frontend estará disponible en: http://localhost:5173
 - Middleware de autenticación en rutas protegidas
 - Headers de seguridad con Helmet
 - CORS configurado
+- Validación de campos únicos (email, DNI, teléfono)
+- Registro público solo permite crear usuarios SOCIO
+- Validación de suscripción activa para reservar clases
+
+## Validaciones y Reglas de Negocio
+
+### Registro de Usuarios
+- Email único y obligatorio
+- DNI único y obligatorio (formato: 8 dígitos + 1 letra)
+- Teléfono único y opcional (si se proporciona, debe ser único)
+- Todos los usuarios se registran como SOCIO por defecto
+- Los roles de Monitor y Admin solo pueden ser asignados por administradores
+
+### Gestión de Roles
+- Un administrador no puede cambiar su propio rol
+- No se puede cambiar el rol de un usuario que tiene reservas activas
+- Solo los administradores pueden cambiar roles de usuarios
+
+### Reservas
+- Requiere suscripción activa para realizar reservas
+- No se pueden reservar clases canceladas o completadas
+- No se pueden reservar clases pasadas
+- Control de cupos disponibles
+- Validación de reservas duplicadas
+- Deduplicación automática: si un usuario reserva, cancela y vuelve a reservar la misma clase, solo se muestra la reserva confirmada
+
+### Clases
+- Los monitores solo pueden editar/cancelar sus propias clases
+- Solo los administradores pueden eliminar clases
+- Las clases pasadas se marcan automáticamente como completadas
+- Al cancelar una clase, se cancelan automáticamente todas las reservas asociadas
+- Descripción de clase es opcional
+- Para socios: clases canceladas y completadas se ocultan después de 7 días
+
+### Reservas para Socios
+- Las reservas completadas se ocultan después de 7 días
+- En el filtro "Todas" se muestran todas las reservas activas, canceladas y completadas de la última semana
 
 ## Estado del Proyecto
 

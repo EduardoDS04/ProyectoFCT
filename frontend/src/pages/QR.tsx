@@ -87,10 +87,10 @@ const QR = () => {
             <div className="qr-code-wrapper">
               <QRCode
                 value={JSON.stringify(qrData)}
-                size={256}
+                size={180}
                 level="H"
                 style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
-                viewBox={`0 0 256 256`}
+                viewBox={`0 0 180 180`}
               />
             </div>
 

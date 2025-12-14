@@ -401,7 +401,7 @@ export const archiveFeedback = async (
 
     // Recargar el feedback para obtener todos los datos actualizados
     const updatedFeedback = await Feedback.findById(id)
-      .select('userId userName message type messages lastReadByAdmin archived createdAt updatedAt')
+      .select(FEEDBACK_FULL_FIELDS)
       .lean();
 
     res.status(200).json({

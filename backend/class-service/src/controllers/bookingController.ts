@@ -5,6 +5,7 @@ import Class from '../models/Class';
 import { AuthRequest, CreateBookingDTO, BookingStatus, ClassStatus, UserRole } from '../types';
 
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL;
+const PAYMENT_SERVICE_URL = process.env.PAYMENT_SERVICE_URL || 'http://localhost:3003';
 
 if (!AUTH_SERVICE_URL) {
   console.error('Error: AUTH_SERVICE_URL no está definida en las variables de entorno');
@@ -88,6 +89,37 @@ export const createBooking = async (req: AuthRequest, res: Response): Promise<vo
       res.status(401).json({
         success: false,
         message: 'Usuario no autenticado correctamente'
+      });
+      return;
+    }
+
+    // Verificar que el usuario tiene una suscripción activa
+    try {
+      const token = req.headers.authorization?.split(' ')[1];
+      const subscriptionResponse = await axios.get(
+        `${PAYMENT_SERVICE_URL}/api/payments/me/active`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (subscriptionResponse.data.success && subscriptionResponse.data.data) {
+        const hasActiveSubscription = subscriptionResponse.data.data.hasActiveSubscription;
+        if (!hasActiveSubscription) {
+          res.status(403).json({
+            success: false,
+            message: 'Necesitas una suscripción activa para reservar clases'
+          });
+          return;
+        }
+      }
+    } catch (error: any) {
+      // Si el servicio de pagos no está disponible, denegar la reserva por seguridad
+      res.status(503).json({
+        success: false,
+        message: 'No se pudo verificar tu suscripción. Por favor, intenta más tarde.'
       });
       return;
     }
@@ -241,7 +273,10 @@ export const getMyBookings = async (req: AuthRequest, res: Response): Promise<vo
     }
 
     const bookings = await Booking.find(filter)
-      .populate('classId')
+      .populate({
+        path: 'classId',
+        options: { strictPopulate: false }
+      })
       .sort({ bookingDate: -1 });
 
     res.status(200).json({
@@ -318,7 +353,6 @@ export const getClassBookings = async (req: AuthRequest, res: Response): Promise
         });
       }
     } catch (error) {
-      console.error('Error al obtener usuarios desde Auth Service:', error);
     }
 
     // Agregar emails a las reservas
@@ -362,7 +396,10 @@ export const getAllBookings = async (req: AuthRequest, res: Response): Promise<v
     if (classId) filter.classId = classId;
 
     const bookings = await Booking.find(filter)
-      .populate('classId')
+      .populate({
+        path: 'classId',
+        options: { strictPopulate: false }
+      })
       .sort({ bookingDate: -1 });
 
     res.status(200).json({

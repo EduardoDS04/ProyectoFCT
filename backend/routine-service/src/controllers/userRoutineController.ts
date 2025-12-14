@@ -2,6 +2,7 @@ import { Response } from 'express';
 import UserRoutine from '../models/UserRoutine';
 import Exercise from '../models/Exercise';
 import { AuthRequest, ApiResponse } from '../types';
+import { EXERCISE_POPULATE_FIELDS, handleValidationError, validateExercisesExist, validateExerciseIndex } from '../utils/helpers';
 
 // Obtener mi rutina personalizada
 export const getMyRoutine = async (
@@ -10,7 +11,7 @@ export const getMyRoutine = async (
 ): Promise<void> => {
   try {
     const userRoutine = await UserRoutine.findOne({ userId: req.userId })
-      .populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl')
+      .populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS)
       .select('-__v');
 
     if (!userRoutine) {
@@ -61,8 +62,8 @@ export const createOrUpdateMyRoutine = async (
 
     // Verificar que todos los ejercicios existan
     const exerciseIds = exercises.map((ex: any) => ex.exerciseId);
-    const existingExercises = await Exercise.find({ _id: { $in: exerciseIds } });
-    if (existingExercises.length !== exerciseIds.length) {
+    const exercisesExist = await validateExercisesExist(exerciseIds);
+    if (!exercisesExist) {
       res.status(400).json({
         success: false,
         message: 'Uno o más ejercicios no existen'
@@ -108,7 +109,7 @@ export const createOrUpdateMyRoutine = async (
     }
 
     // obtener ejercicios para la respuesta
-    await userRoutine.populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl');
+    await userRoutine.populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS);
 
     res.status(200).json({
       success: true,
@@ -118,14 +119,7 @@ export const createOrUpdateMyRoutine = async (
   } catch (error: any) {
     console.error('Error al crear/actualizar rutina personalizada:', error);
     
-    if (error.name === 'ValidationError' && error.errors) {
-      const firstError = Object.values(error.errors)[0] as { message?: string };
-      res.status(400).json({
-        success: false,
-        message: firstError?.message || 'Error de validación'
-      });
-      return;
-    }
+    if (handleValidationError(error, res)) return;
 
     res.status(500).json({
       success: false,
@@ -197,7 +191,7 @@ export const addExerciseToMyRoutine = async (
     userRoutine.exercises.push(exerciseData);
 
     await userRoutine.save();
-    await userRoutine.populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl');
+    await userRoutine.populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS);
 
     res.status(200).json({
       success: true,
@@ -207,14 +201,7 @@ export const addExerciseToMyRoutine = async (
   } catch (error: any) {
     console.error('Error al añadir ejercicio a rutina:', error);
     
-    if (error.name === 'ValidationError' && error.errors) {
-      const firstError = Object.values(error.errors)[0] as { message?: string };
-      res.status(400).json({
-        success: false,
-        message: firstError?.message || 'Error de validación'
-      });
-      return;
-    }
+    if (handleValidationError(error, res)) return;
 
     res.status(500).json({
       success: false,
@@ -253,7 +240,7 @@ export const removeExerciseFromMyRoutine = async (
     // Eliminar ejercicio del array
     userRoutine.exercises.splice(index, 1);
     await userRoutine.save();
-    await userRoutine.populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl');
+    await userRoutine.populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS);
 
     res.status(200).json({
       success: true,
@@ -329,7 +316,7 @@ export const updateExerciseInMyRoutine = async (
     }
 
     await userRoutine.save();
-    await userRoutine.populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl');
+    await userRoutine.populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS);
 
     res.status(200).json({
       success: true,
@@ -374,9 +361,8 @@ export const reorderExercisesInMyRoutine = async (
     const from = parseInt(fromIndex);
     const to = parseInt(toIndex);
 
-    if (isNaN(from) || isNaN(to) || 
-        from < 0 || from >= userRoutine.exercises.length ||
-        to < 0 || to >= userRoutine.exercises.length) {
+    if (!validateExerciseIndex(from, userRoutine.exercises.length) || 
+        !validateExerciseIndex(to, userRoutine.exercises.length)) {
       res.status(400).json({
         success: false,
         message: 'Índices inválidos'
@@ -389,7 +375,7 @@ export const reorderExercisesInMyRoutine = async (
     userRoutine.exercises.splice(to, 0, movedExercise);
 
     await userRoutine.save();
-    await userRoutine.populate('exercises.exerciseId', 'title description youtubeVideoId muscleGroup difficulty thumbnailUrl');
+    await userRoutine.populate('exercises.exerciseId', EXERCISE_POPULATE_FIELDS);
 
     res.status(200).json({
       success: true,

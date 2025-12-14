@@ -9,21 +9,6 @@ export enum UserRole {
   ADMIN = 'admin'
 }
 
-// Interfaz que representa la estructura completa de un usuario
-// Se usa para tipar objetos de usuario en toda la aplicacion
-export interface IUser {
-  _id?: string;              // ID unico de MongoDB
-  email: string;             // Email del usuario, debe ser unico
-  password: string;          // Contrasena hasheada
-  name: string;              // Nombre completo del usuario
-  role: UserRole;            // Rol del usuario en el sistema
-  phone?: string;            // Telefono de contacto, opcional
-  birthDate?: Date;          // Fecha de nacimiento, opcional
-  isActive: boolean;         // Indica si el usuario esta activo o desactivado
-  createdAt?: Date;         // Fecha de creacion, agregada automaticamente por MongoDB
-  updatedAt?: Date;          // Fecha de ultima actualizacion, agregada automaticamente
-}
-
 // Interfaz que extiende Request de Express para incluir informacion del usuario autenticado
 // Se usa en los middlewares y controladores para acceder a los datos del usuario
 export interface AuthRequest extends Request {
@@ -45,11 +30,11 @@ export interface RegisterDTO {
   email: string;             
   password: string;          
   name: string;              
+  dni?: string;         
   role?: UserRole;           
   phone?: string;            
-  birthDate?: string;       
+  birthDate?: string;        
 }
-
 
 // Define la estructura de datos que debe enviar el cliente al endpoint de login
 // Solo requiere las credenciales basicas para autenticarse
@@ -77,4 +62,3 @@ export interface ApiResponse<T = unknown> {
   message?: string;
   data?: T;
 }
-
