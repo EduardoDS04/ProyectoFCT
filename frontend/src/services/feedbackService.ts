@@ -35,6 +35,15 @@ feedbackApi.interceptors.request.use(
   }
 );
 
+// Interceptor para manejar errores de respuesta - no redirigir automáticamente
+feedbackApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // No hacer redirect automático, solo rechazar el error
+    return Promise.reject(error);
+  }
+);
+
 class FeedbackService {
   /**
    * Crear un nuevo feedback (solo para socios)
@@ -148,7 +157,10 @@ class FeedbackService {
       }
       return 0;
     } catch (error) {
-      console.error('Error al obtener contador de notificaciones:', error);
+      // Solo loguear si no es un error 401 (no autorizado), que es esperado para usuarios nuevos
+      if (axios.isAxiosError(error) && error.response?.status !== 401) {
+        console.warn('Error al obtener contador de notificaciones:', error);
+      }
       return 0;
     }
   }

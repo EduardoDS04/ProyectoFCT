@@ -61,8 +61,15 @@ const ClassForm = () => {
       }
 
       // Formatear fecha para input datetime-local
+      // Convertir de UTC a hora local del usuario
       const scheduleDate = new Date(classData.schedule);
-      const formattedDate = scheduleDate.toISOString().slice(0, 16);
+      // Obtener año, mes, día, hora y minuto en hora local
+      const year = scheduleDate.getFullYear();
+      const month = String(scheduleDate.getMonth() + 1).padStart(2, '0');
+      const day = String(scheduleDate.getDate()).padStart(2, '0');
+      const hours = String(scheduleDate.getHours()).padStart(2, '0');
+      const minutes = String(scheduleDate.getMinutes()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
 
       setFormData({
         name: classData.name,

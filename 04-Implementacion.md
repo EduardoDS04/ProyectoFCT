@@ -108,7 +108,7 @@ export const verifyToken = async (
 
     // Agregar informacion del usuario al request
     const user = response.data.data;
-    req.userId = user._id;
+    req.userId = String(user.id || user._id);
     req.userRole = user.role;
     req.userEmail = user.email;
     req.userName = user.name;
@@ -134,7 +134,7 @@ export const verifyToken = async (
 };
 ```
 
-**Explicación:** A diferencia del Auth Service que valida tokens localmente, los demás microservicios hacen una petición HTTP al Auth Service usando Axios. El token recibido se reenvía al endpoint `/api/auth/profile` del Auth Service, que valida el token y retorna los datos del usuario. Si la respuesta es exitosa, se extraen los datos (`_id`, `role`, `email`, `name`) y se agregan al objeto `req`. Este patrón centraliza la autenticación en un solo servicio, evitando duplicar lógica y facilitando el mantenimiento.
+**Explicación:** A diferencia del Auth Service que valida tokens localmente, los demás microservicios hacen una petición HTTP al Auth Service usando Axios. El token recibido se reenvía al endpoint `/api/auth/profile` del Auth Service, que valida el token y retorna los datos del usuario. Si la respuesta es exitosa, se extraen los datos (`id` o `_id`, `role`, `email`, `name`) y se agregan al objeto `req`. El `userId` se convierte explícitamente a string para garantizar consistencia en las comparaciones. Este patrón centraliza la autenticación en un solo servicio, evitando duplicar lógica y facilitando el mantenimiento.
 
 ## 3. Helpers y Utilidades (Refactorización)
 

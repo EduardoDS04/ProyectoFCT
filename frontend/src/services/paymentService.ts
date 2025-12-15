@@ -1,4 +1,5 @@
 import api from './api';
+import axios from 'axios';
 import type {
   Subscription,
   CreateSubscriptionData,
@@ -41,7 +42,10 @@ class PaymentService {
       );
       return response.data.data?.hasActiveSubscription || false;
     } catch (error) {
-      console.warn('Error al verificar suscripción activa:', error);
+      // Solo loguear si no es un error 401 (no autorizado), que es esperado para usuarios nuevos
+      if (axios.isAxiosError(error) && error.response?.status !== 401) {
+        console.warn('Error al verificar suscripción activa:', error);
+      }
       return false;
     }
   }

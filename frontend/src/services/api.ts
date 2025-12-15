@@ -36,9 +36,21 @@ api.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       const url = error.config?.url || '';
-      // No redirigir si es un error de login o cambio de contraseña
-      if (!url.includes('/login') && !url.includes('/change-password')) {
-        // Token expirado o inválido - solo redirigir si no estamos en login
+      // Estos endpoints pueden fallar con 401 por razones no críticas (ej: usuario sin suscripción, sin notificaciones, etc.)
+      const nonCriticalEndpoints = [
+        '/login',
+        '/register',
+        '/change-password',
+        '/profile',
+        '/feedback/notifications',
+        '/payments/',
+        '/feedback/unanswered'
+      ];
+      
+      const isNonCritical = nonCriticalEndpoints.some(endpoint => url.includes(endpoint));
+      
+      if (!isNonCritical) {
+        // Token expirado o inválido - solo redirigir si no estamos en rutas que pueden fallar normalmente
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';

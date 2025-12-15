@@ -601,6 +601,8 @@ El frontend estará disponible en: http://localhost:5173
 - Al cancelar una clase, se cancelan automáticamente todas las reservas asociadas
 - Descripción de clase es opcional
 - Para socios: clases canceladas y completadas se ocultan después de 7 días
+- Un monitor no puede tener dos clases que se solapen en tiempo (se considera la duración completa de cada clase, no solo la hora de inicio)
+- Dos clases en la misma sala no pueden solaparse en tiempo (se considera la duración completa de cada clase)
 
 ### Reservas para Socios
 - Las reservas completadas se ocultan después de 7 días

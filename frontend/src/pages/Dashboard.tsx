@@ -17,13 +17,14 @@ const Dashboard = () => {
   // Verificar si el socio tiene suscripcion activa
   useEffect(() => {
     const checkSubscription = async () => {
-      if (user?.role === UserRole.SOCIO) {
+      if (user?.role === UserRole.SOCIO && user?.id) {
         try {
           setIsCheckingSubscription(true);
           const hasActive = await paymentService.checkActiveSubscription();
           setHasActiveSubscription(hasActive);
         } catch (error) {
-          console.warn('Error al verificar suscripcion:', error);
+          
+          console.warn('Error al verificar suscripcion (normal para usuarios nuevos):', error);
           setHasActiveSubscription(false);
         } finally {
           setIsCheckingSubscription(false);
@@ -33,27 +34,29 @@ const Dashboard = () => {
       }
     };
 
-    // Solo verificar suscripcion si el usuario ya esta cargado
-    if (!authLoading && user) {
+    // Solo verificar suscripcion si el usuario ya esta completamente cargado y tiene id
+    if (!authLoading && user && user.id) {
       checkSubscription();
     }
-  }, [user?.role, authLoading, user]);
+  }, [user?.role, authLoading, user?.id]);
 
   // Cargar contador de feedbacks sin responder para admin
   useEffect(() => {
     const loadUnansweredCount = async () => {
-      if (user?.role === UserRole.ADMIN) {
+      if (user?.role === UserRole.ADMIN && user?.id) {
         try {
           const count = await feedbackService.getUnansweredFeedbacksCount();
           setUnansweredFeedbacksCount(count);
         } catch (error) {
-          console.error('Error al cargar contador de feedbacks:', error);
+          console.warn('Error al cargar contador de feedbacks:', error);
         }
       }
     };
 
-    if (!authLoading && user) {
+    // Solo cargar si el usuario está completamente cargado y tiene id
+    if (!authLoading && user && user.id) {
       loadUnansweredCount();
+      
       // Actualizar cada 30 segundos
       const interval = setInterval(loadUnansweredCount, 30000);
       
@@ -68,7 +71,7 @@ const Dashboard = () => {
         window.removeEventListener('feedback-responded', handleFeedbackResponded);
       };
     }
-  }, [user?.role, authLoading, user, location.pathname]);
+  }, [user?.role, authLoading, user?.id, location.pathname]);
 
   // Funcion auxiliar para obtener el mensaje de bienvenida segun el rol
   const getWelcomeMessage = (role: UserRole) => {

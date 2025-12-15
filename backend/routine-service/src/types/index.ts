@@ -19,7 +19,8 @@ export interface AuthRequest extends Request {
 export interface AuthServiceUserResponse {
   success: boolean;
   data?: {
-    _id: string;
+    id?: string;  // El auth-service devuelve 'id'
+    _id?: string; // Fallback por compatibilidad
     email: string;
     name: string;
     role: UserRole;

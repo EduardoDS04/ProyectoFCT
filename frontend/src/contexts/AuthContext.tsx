@@ -28,23 +28,37 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const savedUser = authService.getUser();
 
         if (savedToken && savedUser) {
+          // Establecer inmediatamente para que isAuthenticated sea true
           setToken(savedToken);
           setUser(savedUser);
+          setIsLoading(false); // Establecer loading en false inmediatamente
           
-          // Verificar que el token siga siendo válido
+          // Verificar que el token siga siendo válido en segundo plano
+          // No bloquear la navegación si esto falla
           try {
             const profile = await authService.getProfile();
-            setUser(profile);
+            // Solo actualizar si el perfil tiene id válido
+            if (profile && profile.id) {
+              setUser(profile);
+              authService.setUser(profile);
+            }
           } catch {
-            // Token inválido
-            authService.logout();
-            setToken(null);
-            setUser(null);
+            // Si falla getProfile, mantener el usuario guardado si tiene id válido
+            if (savedUser && savedUser.id) {
+              // Mantener el usuario guardado, solo limpiar si realmente no hay token válido
+              console.warn('No se pudo obtener el perfil, usando usuario guardado');
+            } else {
+              // Token inválido o usuario sin id
+              authService.logout();
+              setToken(null);
+              setUser(null);
+            }
           }
+        } else {
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Error al cargar usuario:', error);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -59,6 +73,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       if (response.success && response.data) {
         const { token: newToken, user: userData } = response.data;
+        
+        // Verificar que el usuario tenga id válido
+        if (!userData || !userData.id) {
+          throw new Error('Respuesta de login inválida: usuario sin id');
+        }
         
         // crear objeto User completo con isActive por defecto 
         const completeUser: User = {
@@ -88,6 +107,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       if (response.success && response.data) {
         const { token: newToken, user: userData } = response.data;
+        
+        // Verificar que el usuario tenga id válido
+        if (!userData || !userData.id) {
+          throw new Error('Respuesta de registro inválida: usuario sin id');
+        }
         
         // crear objeto User completo con isActive por defecto
         const completeUser: User = {
@@ -123,10 +147,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     authService.setUser(updatedUser);
   };
 
+  // Calcular isAuthenticated basado en token y user
+  // Asegurarse de que ambos estén presentes y el usuario tenga id
+  const isAuthenticated = !!(token && user && user.id);
+
   const value: AuthContextType = {
     user,
     token,
-    isAuthenticated: !!token && !!user,
+    isAuthenticated,
     isLoading,
     login,
     register,

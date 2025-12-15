@@ -32,11 +32,60 @@ const canModifyClass = (req: AuthRequest, classData: any): boolean => {
   return req.userRole === UserRole.ADMIN || classData.monitorId === req.userId;
 };
 
-// verificar conflicto de horario del monitor
-const hasScheduleConflict = async (monitorId: string, schedule: Date, excludeId?: string) => {
-  const filter: any = { monitorId, schedule, status: { $ne: ClassStatus.CANCELLED } };
+// verificar conflicto de horario del monitor (considerando duración y solapamientos)
+const hasScheduleConflict = async (monitorId: string, schedule: Date, duration: number, excludeId?: string) => {
+  const classStart = new Date(schedule);
+  const classEnd = new Date(classStart.getTime() + duration * 60000); // duration en minutos a milisegundos
+
+  // Buscar todas las clases activas del monitor que no estén canceladas
+  const filter: any = { 
+    monitorId, 
+    status: { $ne: ClassStatus.CANCELLED } 
+  };
   if (excludeId) filter._id = { $ne: excludeId };
-  return await Class.findOne(filter);
+
+  const existingClasses = await Class.find(filter);
+
+  // Verificar si alguna clase existente se solapa con la nueva clase
+  for (const existingClass of existingClasses) {
+    const existingStart = new Date(existingClass.schedule);
+    const existingEnd = new Date(existingStart.getTime() + existingClass.duration * 60000);
+
+    // Dos clases se solapan si: startA < endB && startB < endA
+    if (classStart < existingEnd && existingStart < classEnd) {
+      return existingClass;
+    }
+  }
+
+  return null;
+};
+
+// verificar conflicto de sala (dos clases en la misma sala no pueden solaparse)
+const hasRoomConflict = async (room: string, schedule: Date, duration: number, excludeId?: string) => {
+  const classStart = new Date(schedule);
+  const classEnd = new Date(classStart.getTime() + duration * 60000);
+
+  // Buscar todas las clases activas en la misma sala que no estén canceladas
+  const filter: any = { 
+    room, 
+    status: { $ne: ClassStatus.CANCELLED } 
+  };
+  if (excludeId) filter._id = { $ne: excludeId };
+
+  const existingClasses = await Class.find(filter);
+
+  // Verificar si alguna clase existente en la misma sala se solapa con la nueva clase
+  for (const existingClass of existingClasses) {
+    const existingStart = new Date(existingClass.schedule);
+    const existingEnd = new Date(existingStart.getTime() + existingClass.duration * 60000);
+
+    // Dos clases se solapan si: startA < endB && startB < endA
+    if (classStart < existingEnd && existingStart < classEnd) {
+      return existingClass;
+    }
+  }
+
+  return null;
 };
 
 // obtener todas las clases con filtros opcionales
@@ -86,9 +135,20 @@ export const createClass = async (req: AuthRequest, res: Response): Promise<void
     const classDate = new Date(schedule);
     if (classDate <= new Date()) return sendError(res, 400, 'La fecha de la clase debe ser futura');
 
-    // verificar que el monitor no tenga otra clase en el mismo horario
-    if (await hasScheduleConflict(req.userId!, classDate)) {
-      return sendError(res, 400, 'Ya tienes una clase programada en esta fecha y hora. No puedes estar en dos lugares al mismo tiempo.');
+    // verificar que el monitor no tenga otra clase que se solape en tiempo
+    const monitorConflict = await hasScheduleConflict(req.userId!, classDate, duration);
+    if (monitorConflict) {
+      const conflictStart = new Date(monitorConflict.schedule);
+      const conflictEnd = new Date(conflictStart.getTime() + monitorConflict.duration * 60000);
+      return sendError(res, 400, `Ya tienes una clase programada que se solapa con este horario. Clase existente: ${monitorConflict.name} (${conflictStart.toLocaleString('es-ES')} - ${conflictEnd.toLocaleString('es-ES')}). No puedes estar en dos lugares al mismo tiempo.`);
+    }
+
+    // verificar que no haya otra clase en la misma sala que se solape en tiempo
+    const roomConflict = await hasRoomConflict(room, classDate, duration);
+    if (roomConflict) {
+      const conflictStart = new Date(roomConflict.schedule);
+      const conflictEnd = new Date(conflictStart.getTime() + roomConflict.duration * 60000);
+      return sendError(res, 400, `La sala ${room} ya tiene una clase programada que se solapa con este horario. Clase existente: ${roomConflict.name} (${conflictStart.toLocaleString('es-ES')} - ${conflictEnd.toLocaleString('es-ES')}).`);
     }
 
     const newClass = await Class.create({
@@ -125,15 +185,36 @@ export const updateClass = async (req: AuthRequest, res: Response): Promise<void
     }
     if (new Date(classData.schedule) < new Date()) return sendError(res, 400, 'No se pueden editar clases que ya han finalizado');
 
-    // si se actualiza la fecha, validar conflictos de horario
+    // determinar la fecha y duración finales para validar conflictos
+    const finalSchedule = updates.schedule ? new Date(updates.schedule) : new Date(classData.schedule);
+    const finalDuration = updates.duration !== undefined ? updates.duration : classData.duration;
+    const finalRoom = updates.room || classData.room;
+
+    // si se actualiza la fecha, validar que sea futura
     if (updates.schedule) {
-      const newDate = new Date(updates.schedule);
-      if (newDate <= new Date()) return sendError(res, 400, 'La fecha de la clase debe ser futura');
+      if (finalSchedule <= new Date()) return sendError(res, 400, 'La fecha de la clase debe ser futura');
+      updates.schedule = finalSchedule;
+    }
+
+    // validar conflictos de horario del monitor (si cambió fecha o duración)
+    if (updates.schedule || updates.duration !== undefined) {
       const monitorId = req.userRole === UserRole.ADMIN ? classData.monitorId : req.userId!;
-      if (await hasScheduleConflict(monitorId, newDate, id)) {
-        return sendError(res, 400, 'El monitor ya tiene una clase programada en esta fecha y hora. No puede estar en dos lugares al mismo tiempo.');
+      const monitorConflict = await hasScheduleConflict(monitorId, finalSchedule, finalDuration, id);
+      if (monitorConflict) {
+        const conflictStart = new Date(monitorConflict.schedule);
+        const conflictEnd = new Date(conflictStart.getTime() + monitorConflict.duration * 60000);
+        return sendError(res, 400, `El monitor ya tiene una clase programada que se solapa con este horario. Clase existente: ${monitorConflict.name} (${conflictStart.toLocaleString('es-ES')} - ${conflictEnd.toLocaleString('es-ES')}). No puede estar en dos lugares al mismo tiempo.`);
       }
-      updates.schedule = newDate;
+    }
+
+    // validar conflictos de sala (si cambió fecha, duración o sala)
+    if (updates.schedule || updates.duration !== undefined || updates.room) {
+      const roomConflict = await hasRoomConflict(finalRoom, finalSchedule, finalDuration, id);
+      if (roomConflict) {
+        const conflictStart = new Date(roomConflict.schedule);
+        const conflictEnd = new Date(conflictStart.getTime() + roomConflict.duration * 60000);
+        return sendError(res, 400, `La sala ${finalRoom} ya tiene una clase programada que se solapa con este horario. Clase existente: ${roomConflict.name} (${conflictStart.toLocaleString('es-ES')} - ${conflictEnd.toLocaleString('es-ES')}).`);
+      }
     }
 
     // validar que no se reduzca el aforo por debajo de participantes actuales

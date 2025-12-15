@@ -2,22 +2,27 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import feedbackService from '../services/feedbackService';
+import axios from 'axios';
 import '../styles/Navbar.css';
 
 // Componente de navegacion principal de la aplicacion
 // Muestra diferentes enlaces segun el estado de autenticacion y el rol del usuario
 const Navbar = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Cargar contador de notificaciones para socios
   useEffect(() => {
-    if (isAuthenticated && user?.role === 'socio') {
+    // Solo cargar si el usuario está completamente autenticado y cargado, y es socio
+    if (!isLoading && isAuthenticated && user?.role === 'socio' && user?.id) {
       loadUnreadCount();
+      
       // Actualizar cada 30 segundos
-      const interval = setInterval(loadUnreadCount, 30000);
+      const interval = setInterval(() => {
+        loadUnreadCount();
+      }, 30000);
       
       // Escuchar eventos de actualización de notificaciones
       const handleNotificationsUpdate = () => {
@@ -32,14 +37,17 @@ const Navbar = () => {
         window.removeEventListener('notifications-updated', handleNotificationsUpdate);
       };
     }
-  }, [isAuthenticated, user, location.pathname]);
+  }, [isAuthenticated, user, isLoading, location.pathname]);
 
   const loadUnreadCount = async () => {
     try {
       const count = await feedbackService.getUnreadNotificationsCount();
       setUnreadCount(count);
     } catch (error) {
-      console.error('Error al cargar contador de notificaciones:', error);
+      // Solo loguear si no es un error 401 (esperado para usuarios nuevos)
+      if (axios.isAxiosError(error) && error.response?.status !== 401) {
+        console.warn('Error al cargar contador de notificaciones:', error);
+      }
     }
   };
 
